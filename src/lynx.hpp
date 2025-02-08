@@ -1,11 +1,10 @@
 /**
- * @file fux.hpp
- * @author fuechs
- * @brief fux base header
+ * @file lynx.hpp
+ * @brief base header
  * @version 0.1
  * @date 2022-11-03
  * 
- * @copyright Copyright (c) 2020-2023, Fuechs and Contributors. All rights reserved.
+ * @copyright Copyright (c) 2020-2025, Fuechs and Contributors.
  * 
  */
 
@@ -33,16 +32,16 @@ using std::cout, std::cerr, std::endl, std::exception, std::make_shared, std::ma
 
 using StringVec = vector<string>;
 
-// #define ERROR_TEST
+#define ERROR_TEST
 
-// #define FUX_BACKEND
+// #define LYNX_BACKEND
 
-#ifdef FUX_BACKEND
+#ifdef LYNX_BACKEND
     // do nothing
-    #define FUX_BC(code) code
+    #define LYNX_BC(code) code
 #else
     // remove redundant (backend) code
-    #define FUX_BC(code)
+    #define LYNX_BC(code)
 #endif
 
 // #define FUX_ANALYSER

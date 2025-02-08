@@ -15,10 +15,14 @@
 
 /// SUBJECT ///
 
-Subject::Subject(Metadata meta, Underline::Ptr primary, Underline::Ptr secondary, Comment::Vec comments, 
-    Suggestion::Vec suggestions, Vec references, Ptr traceback) 
-: meta(meta), primary(primary), secondary(secondary), comments(comments), 
-    suggestions(suggestions), references(references), traceback(traceback){}
+Subject::Subject(Metadata meta, Underline::Ptr primary, Underline::Ptr secondary, BlockHighlight::Ptr highlight, 
+    Comment::Vec comments, Suggestion::Vec suggestions, Vec references, Ptr traceback) 
+: meta(meta), primary(primary), secondary(secondary), highlight(highlight), comments(comments), 
+    suggestions(suggestions), references(references), traceback(traceback) 
+{
+    if (highlight && (primary || secondary || !comments.empty()))
+        assert(!"Cannot render both highlight and underline or comment in an error.");
+}
 
 Subject::~Subject() {
     comments.clear();

@@ -41,6 +41,11 @@ string Underline::print(size_t padding, size_t &cursor, size_t size) {
     return ss.str();
 }
 
+BlockHighlight::BlockHighlight(size_t start, size_t end, string message) 
+: start(start), end(end), message(message) {}
+
+BlockHighlight::~BlockHighlight() { message.clear(); }
+
 Comment::Comment(size_t line, size_t col, string message) 
 : line(line), col(col), message(message) {}
 

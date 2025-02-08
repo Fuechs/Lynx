@@ -50,6 +50,25 @@ struct Underline {
     string message;
 };
 
+struct BlockHighlight {
+    using Ptr = shared_ptr<BlockHighlight>;
+    using Vec = vector<Ptr>;
+
+    BlockHighlight(size_t start = 0, size_t end = 0, string message = "");
+    ~BlockHighlight();
+
+    size_t start, end; // first and last line
+    string message;
+
+    /*
+              |  ____________
+      [start] | | foo_bar++; 
+          ... | | ...
+        [end] | | buzz(); 
+              | \__ <message> 
+    */
+};
+
 struct Comment {
     using Ptr = shared_ptr<Comment>;
     using Vec = vector<Ptr>;

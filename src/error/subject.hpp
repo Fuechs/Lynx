@@ -22,7 +22,7 @@ public:
     using Vec = vector<Ptr>;
 
     Subject(Metadata meta = {}, Underline::Ptr primary = nullptr, 
-        Underline::Ptr secondary = nullptr, Comment::Vec comments = {}, 
+        Underline::Ptr secondary = nullptr, BlockHighlight::Ptr highlight = {}, Comment::Vec comments = {}, 
         Suggestion::Vec suggestions = {},
         Vec references = {}, Ptr traceback = nullptr);
     ~Subject();
@@ -32,6 +32,7 @@ public:
 private:
     Underline::Ptr primary;
     Underline::Ptr secondary;
+    BlockHighlight::Ptr highlight;
     Comment::Vec comments;
     Suggestion::Vec suggestions;
     Vec references;

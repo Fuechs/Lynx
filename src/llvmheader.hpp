@@ -5,15 +5,15 @@
  * @version 0.1
  * @date 2022-11-27
  * 
- * @copyright Copyright (c) 2020-2023, Fuechs and Contributors. All rights reserved.
+ * @copyright Copyright (c) 2020-2025, Fuechs and Contributors. 
  * 
  */
 
 #pragma once
 
-#include "fux.hpp"
+#include "lynx.hpp"
 
-#ifdef FUX_BACKEND
+#ifdef LYNX_BACKEND
 
 #include "eisdrache/eisdrache.hpp"
 

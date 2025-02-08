@@ -24,7 +24,7 @@ public:
 
     void generate();
     
-    static Eisdrache::Ty *getType(Eisdrache *eisdrache, FuxType type);
+    static Eisdrache::Ty *getType(Eisdrache *eisdrache, Fux::Type type);
 
 private:
     Root::Ptr root;
