@@ -14,6 +14,10 @@ llvm_testing/
 unused/
 old*
 test*
+docs/
+build
+cmake*
+.idea
 
 # files
 CHANGELOG.md
