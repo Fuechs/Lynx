@@ -4,10 +4,8 @@
 #include <vector>
 
 #include "stmt.h"
-#include "../lexer/token.h"
 #include "operation.h"
-
-using Value = double; // temporary
+#include "./parser/value.h"
 
 class Expr : public StmtAST {
 public:
@@ -19,22 +17,33 @@ class BinaryExpr : public Expr {
 public:
     using Ptr = std::shared_ptr<BinaryExpr>;
 
-    BinaryExpr(const BinaryOp &op, const Expr::Ptr &LHS, const Expr::Ptr &RHS);
+    BinaryExpr(const BinaryOp &op, Expr::Ptr LHS, Expr::Ptr RHS);
     ~BinaryExpr() override;
 
-    std::string str() const override;
+    [[nodiscard]] std::string str() const override;
 
 private:
     BinaryOp op;
     Expr::Ptr LHS, RHS;
 };
 
+class SymbolExpr : public Expr {
+public:
+    explicit SymbolExpr(std::string name);
+    ~SymbolExpr() override;
+
+    [[nodiscard]] std::string str() const override;
+
+private:
+    std::string name;
+};
+
 class NumberExpr : public Expr {
 public:
     explicit NumberExpr(const std::string &value);
 
-    std::string str() const override;
+    [[nodiscard]] std::string str() const override;
 
 private:
-    Value value;
+    Value::Ptr value;
 };

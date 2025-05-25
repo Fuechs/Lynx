@@ -1,13 +1,13 @@
 #include <iostream>
 
+#include "io.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 
 int main() {
-    const std::string source = "123+420/69-30*2";
+    const std::string source = readFile("src/test/test.lynx");
     const Lexer lexer(source);
     const Token::Vec tokens = lexer.lex();
-
 
     for (auto &token : tokens)
         std::cout << token.str() << '\n';

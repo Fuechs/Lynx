@@ -38,10 +38,12 @@ Expr::Ptr Parser::parseMultiplicativeExpr() {
 }
 
 Expr::Ptr Parser::parsePrimaryExpr() {
-    if (*it == NUMBER)
-        return std::make_shared<NumberExpr>(eat().getValue());
+    switch (it->getType()) {
+        case IDENTIFIER: return std::make_shared<SymbolExpr>(eat().getValue());
+        case NUMBER: return std::make_shared<NumberExpr>(eat().getValue());
 
-    return nullptr;
+        default: return nullptr;
+    }
 }
 
 constexpr const Token &Parser::eat() {

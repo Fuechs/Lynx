@@ -1,26 +1,34 @@
 #include <format>
+#include <utility>
 
 #include "expr.h"
 
-#include <format>
+// BINARY EXPR
 
-BinaryExpr::BinaryExpr(const BinaryOp &op, const Expr::Ptr &LHS, const Expr::Ptr &RHS)
-: op(op), LHS(LHS), RHS(RHS) {}
+BinaryExpr::BinaryExpr(const BinaryOp &op, Expr::Ptr LHS, Expr::Ptr RHS)
+: op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
 
-BinaryExpr::~BinaryExpr() {}
+BinaryExpr::~BinaryExpr() = default;
 
 std::string BinaryExpr::str() const {
     return "(" + LHS->str() + " " + BinaryOpValue(op) + " " + RHS->str() + ")";
 }
 
-NumberExpr::NumberExpr(const std::string &value) : value(std::stod(value)) {}
+// SYMBOL EXPR
 
-std::string NumberExpr::str() const {
-    std::string s = std::to_string(value);
-    if (s.find('.') != std::string::npos) {
-        s = s.substr(0, s.find_last_not_of('0') + 1);
-        if (s.back() == '.')
-            s.pop_back();
-    }
-    return s;
+SymbolExpr::SymbolExpr(std::string name) : name(std::move(name)) {}
+
+SymbolExpr::~SymbolExpr() { name.clear(); }
+
+std::string SymbolExpr::str() const { return name; }
+
+// NUMBER EXPR
+
+NumberExpr::NumberExpr(const std::string &value) {
+    if (value.contains("."))
+        this->value = std::make_shared<Value>(std::stod(value));
+    else
+        this->value = std::make_shared<Value>(std::stoll(value));
 }
+
+std::string NumberExpr::str() const { return value->str(); }
