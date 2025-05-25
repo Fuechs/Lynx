@@ -1,4 +1,0 @@
-printf(data: str, args: var[], ...): void 
-    puts format(data, args).raw();
-
-printf("Hello %s%c\n", "World", '!');

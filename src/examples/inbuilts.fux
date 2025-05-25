@@ -1,8 +1,0 @@
-return x;
-throw x;
-exit x;
-puts x;
-putch x;
-read x;
-reserve i32, 10, ptr;
-free ptr;

@@ -2,7 +2,7 @@
 .vscode
 
 # executeables / debugger
-fux
+lynx
 main
 *.dSYM
 *.o
@@ -14,7 +14,6 @@ llvm_testing/
 unused/
 old*
 test*
-src/frontend/error/Makefile
 
 # files
 CHANGELOG.md

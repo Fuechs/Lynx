@@ -54,7 +54,7 @@ I've been inspired by [C++](https://isocpp.org/), [Python](https://python.org/),
 - [&cross;] Optimizer [![LLVM][llvm-badge]](https://llvm.org/)
 - [&cross;] Compiler [![LLVM][llvm-badge]](https://llvm.org/)
 
-I consider the language turing complete once it is able to compile and run [Rule 110](../src/examples/rule110.fux). To set a realistic goal though, it is not planned that Fux will support more complex structures, such as classes, as well as pythonic features at that point. 
+I consider the language turing complete once it is able to compile and run [Rule 110](../old_scr/examples/rule110.fux). To set a realistic goal though, it is not planned that Fux will support more complex structures, such as classes, as well as pythonic features at that point. 
 
 ###### [&cross;] Stage II - Core Package
 

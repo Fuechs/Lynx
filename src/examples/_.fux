@@ -1,4 +1,0 @@
-main(argc: u64, argv: **c8): u64 {
-    x: f64 = 8.0;
-    return (u64) x ^= (1.0 % 1.0);
-}

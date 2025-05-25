@@ -15,13 +15,10 @@ C = $(words $N)$(eval N := x $N)
 ECHO = python3.11 $(I)/src/util/compiler_progress.py --stepno=$C --nsteps=$T
 endif
 
-# Copyright (c) 2020-2023, Fuechs and Contributors.
-# All rights reserved.
-
-src = $(wildcard src/*.cpp src/*/*.cpp src/*/*/*.cpp)
+src = $(wildcard src/*.cpp src/*/*.cpp)
 obj = $(src:.cpp=.o)
-hdr = $(wildcard src/*.hpp src/*/*.hpp src/*/*/*.hpp)
-out = fux
+hdr = $(wildcard src/*.h src/*/*.h)
+out = lynx
 cflags = -g -O3 -std=c++20
 ldflags = -g 
 llvmflags = `llvm-config --cxxflags --ldflags --libs core`
@@ -30,12 +27,13 @@ all: $(src) $(obj) $(out)
 
 $(out): $(obj)
 	@$(ECHO) Linking $@
-	@clang++ $(llvmflags) $(ldflags) $^ -o $@
-#	@clang++ $(ldflags) $^ -o $@
+#	@clang++ $(llvmflags) $(ldflags) $^ -o $@
+	@clang++ $(ldflags) $^ -o $@
 
 %.o: %.cpp $(hdr)
 	@$(ECHO) Compiling $<
-	@clang++ `llvm-config --cxxflags` $(cflags) -c $< -o $@
+#	@clang++ `llvm-config --cxxflags` $(cflags) -c $< -o $@
+	@clang++ $(cflags) -c $< -o $@
 
 clean: 
 	@rm $(obj)
