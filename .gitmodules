@@ -1,0 +1,3 @@
+[submodule "src/eisdrache"]
+	path = src/eisdrache
+	url = https://github.com/Fuechs/eisdrache
