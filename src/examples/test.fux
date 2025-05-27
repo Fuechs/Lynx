@@ -1,7 +1,0 @@
-modify(x -> i64): void;
-
-main(argc: u64, argv: **c8): u64 {
-    x: i64 = (i64) argc + 1;
-    modify(x);
-    return x > 0 ? x : -1;
-}

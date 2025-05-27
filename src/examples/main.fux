@@ -1,4 +1,0 @@
-main(argc: u64, argv: **c8): u64 {
-    puts "Hello World!\n";
-    return 0;
-}
