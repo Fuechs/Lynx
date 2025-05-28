@@ -15,8 +15,6 @@ enum TokenType {
     DOT,            // .
     COMMA,          // ,
     POINTER,        // ->
-    LSHIFT,         // <<
-    RSHIFT,         // >>
     AT,             // @
 
     // assignment
@@ -32,8 +30,8 @@ enum TokenType {
     PERCENT_EQUALS, // %=
     OR_EQUALS,      // |=
     AND_EQUALS,     // &=
-    LSH_EQUALS,     // <|=
-    RSH_EQUALS,     // |>=
+    LSH_EQUALS,     // <<=
+    RSH_EQUALS,     // >>=
     SWAP,           // <>
 
     // condition
@@ -61,8 +59,8 @@ enum TokenType {
     BIT_OR,         // |
     BIT_XOR,        // ><
     BIT_AND,        // &
-    BIT_LSHIFT,     // <|
-    BIT_RSHIFT,     // |>
+    BIT_LSHIFT,     // <<
+    BIT_RSHIFT,     // >>
 
     // literals
     IDENTIFIER,

@@ -25,7 +25,7 @@ std::string SymbolExpr::str() const { return name; }
 // NUMBER EXPR
 
 NumberExpr::NumberExpr(const std::string &value) {
-    if (value.contains("."))
+    if (value.find('.') != std::string::npos)
         this->value = std::make_shared<Value>(std::stod(value));
     else
         this->value = std::make_shared<Value>(std::stoll(value));

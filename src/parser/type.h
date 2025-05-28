@@ -9,14 +9,23 @@ public:
     using Vec = std::vector<Ptr>;
 
     enum Kind {
-        INT,
-        FLOAT,
+        I64,
+        F64,
+        PTR,
     };
 
-    Type() = default;
-    virtual ~Type() = default;
+    explicit Type(Kind kind);
+    virtual ~Type();
 
-    [[nodiscard]] virtual Kind getKind() const = 0;
+    [[nodiscard]] virtual constexpr bool isInteger() const { return false; }
+    [[nodiscard]] virtual constexpr bool isFloat() const { return false; }
+    [[nodiscard]] virtual constexpr bool isSigned() const { return false; }
+    [[nodiscard]] virtual constexpr bool isPointer() const { return false;}
+
+    [[nodiscard]] Kind getKind() const;
+
+protected:
+    Kind kind;
 };
 
 class IntType : public Type {
@@ -24,11 +33,37 @@ public:
     using Ptr = std::shared_ptr<IntType>;
     using Vec = std::vector<Ptr>;
 
-    explicit IntType(size_t bits);
-    ~IntType() override;
+    explicit IntType(Kind kind, bool _signed = false);
 
-    [[nodiscard]] Kind getKind() const override;
+    [[nodiscard]] constexpr bool isInteger() const override { return true; }
+    [[nodiscard]] constexpr bool isSigned() const override { return _signed; }
 
 private:
-    size_t bits{};
+    bool _signed;
+};
+
+class FloatType : public Type {
+public:
+    using Ptr = std::shared_ptr<FloatType>;
+    using Vec = std::vector<Ptr>;
+
+    explicit FloatType(Kind kind);
+
+    [[nodiscard]] constexpr bool isFloat() const override { return true; }
+    [[nodiscard]] constexpr bool isSigned() const override { return true; }
+};
+
+class PointerType : public Type {
+public:
+    using Ptr = std::shared_ptr<PointerType>;
+    using Vec = std::vector<Ptr>;
+
+    explicit PointerType(Type::Ptr pointee);
+
+    [[nodiscard]] Type::Ptr getPointee() const;
+
+    [[nodiscard]] constexpr bool isPointer() const override { return true;}
+
+private:
+    Type::Ptr pointee;
 };

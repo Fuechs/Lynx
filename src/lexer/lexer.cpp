@@ -12,10 +12,11 @@ const std::vector<std::pair<TokenType, std::regex>> patterns = {
 
     // three characters
     {TRIPLE_EQUALS, std::regex(R"(===)")},
-    {LSH_EQUALS, std::regex(R"(<\|=)")},
-    {RSH_EQUALS, std::regex(R"(\|>=)")},
+    {LSH_EQUALS, std::regex(R"(<<=)")},
+    {RSH_EQUALS, std::regex(R"(>>=)")},
 
     // two characters
+    {POINTER, std::regex(R"(->)")},
     {PLUS_PLUS, std::regex(R"(\+\+)")},
     {MINUS_MINUS, std::regex(R"(--)")},
     {PLUS_EQUALS, std::regex(R"(\+=)")},
@@ -31,14 +32,11 @@ const std::vector<std::pair<TokenType, std::regex>> patterns = {
     {NOT_EQUALS, std::regex(R"(!=)")},
     {LTEQUALS, std::regex(R"(<=)")},
     {GTEQUALS, std::regex(R"(>=)")},
-    {LSHIFT, std::regex(R"(<<)")},
-    {RSHIFT, std::regex(R"(>>)")},
-    {BIT_XOR, std::regex(R"(><)")},
     {OR, std::regex(R"(\|\|)")},
     {AND, std::regex(R"(&&)")},
-    {BIT_LSHIFT, std::regex(R"(<\|)")},
-    {BIT_RSHIFT, std::regex(R"(\|>)")},
-    {POINTER, std::regex(R"(->)")},
+    {BIT_XOR, std::regex(R"(><)")},
+    {BIT_LSHIFT, std::regex(R"(<<)")},
+    {BIT_RSHIFT, std::regex(R"(>>)")},
 
     // one character
     {LPAREN, std::regex(R"(\()")},
@@ -52,11 +50,11 @@ const std::vector<std::pair<TokenType, std::regex>> patterns = {
     {DOT, std::regex(R"(\.)")},
     {COMMA, std::regex(R"(,)")},
     {AT, std::regex(R"(@)")},
+    {EQUALS, std::regex(R"(\=)")},
     {LESSTHAN, std::regex(R"(<)")},
     {GREATERTHAN, std::regex(R"(>)")},
     {EXCLAMATION, std::regex(R"(!)")},
     {QUESTION, std::regex(R"(\?)")},
-    {EQUALS, std::regex(R"(\=)")},
     {PLUS, std::regex(R"(\+)")},
     {MINUS, std::regex(R"(-)")},
     {ASTERISK, std::regex(R"(\*)")},

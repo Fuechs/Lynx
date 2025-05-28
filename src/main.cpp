@@ -16,5 +16,8 @@ int main() {
     const RootAST::Ptr root = parser.parse();
     std::cout << root->str() << '\n';
 
+    const Type::Ptr ty = std::make_shared<IntType>(Type::I64);
+    std::cout << ty->isInteger() << std::endl;
+
     return 0;
 }

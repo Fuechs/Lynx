@@ -12,8 +12,6 @@ const char *tokenTypeNames[] = {
     "dot",
     "comma",
     "pointer",
-    "lshift",
-    "rshift",
     "at",
 
     "equals",

@@ -3,10 +3,7 @@
 #include <memory>
 #include <string>
 
-enum class ValueType {
-    I64,
-    F64,
-};
+#include "type.h"
 
 class Value {
 public:
@@ -14,12 +11,13 @@ public:
 
     explicit Value(const int64_t &value);
     explicit Value(const double &value);
+
     ~Value();
 
     [[nodiscard]] std::string str() const;
 
 private:
-    ValueType type;
+    Type::Ptr type;
     union {
         int64_t i64;
         double f64;

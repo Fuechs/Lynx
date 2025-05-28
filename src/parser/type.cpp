@@ -1,9 +1,25 @@
 #include "type.h"
 
+#include <utility>
+
+// TYPE
+
+Type::Type(Kind kind) : kind(kind) {}
+
+Type::~Type() = default;
+
+Type::Kind Type::getKind() const { return kind; }
+
 // INT TYPE
 
-IntType::IntType(size_t bits) : bits(bits) {}
+IntType::IntType(Kind kind, bool _signed) : Type(kind), _signed(_signed) {}
 
-IntType::~IntType() = default;
+// FLOAT TYPE
 
-Type::Kind IntType::getKind() const override { return Kind::INT; }
+FloatType::FloatType(Kind kind) : Type(kind) {}
+
+// POINTER TYPE
+
+PointerType::PointerType(Type::Ptr pointee) : Type(PTR), pointee(std::move(pointee)) {}
+
+Type::Ptr PointerType::getPointee() const { return pointee; }
