@@ -234,9 +234,9 @@ the License, but only in their entirety and only with respect to the Combined
 Software.
 
 ==============================================================================
-Software from third parties included in the Fux programming language:
+Software from third parties included in the Lynx programming language:
 ==============================================================================
-The Fux programming language contains third party software which is under different license
+The Lynx programming language contains third party software which is under different license
 terms. All such code will be identified clearly using at least one of two
 mechanisms:
 1) It will be in a separate directory tree with its own `LICENSE.txt` or
