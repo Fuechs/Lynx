@@ -13,11 +13,16 @@ int main() {
         std::cout << token.str() << '\n';
 
     Parser parser(tokens);
-    const RootAST::Ptr root = parser.parse();
+    const Root::Ptr root = parser.parse();
     std::cout << root->str() << '\n';
 
-    const Type::Ptr ty = std::make_shared<IntType>(Type::I64);
-    std::cout << ty->isInteger() << std::endl;
+    Eisdrache::initialize();
+    Eisdrache::Ptr eisdrache = Eisdrache::create("Lynx Compiler");
+
+    eisdrache->declareFunction(eisdrache->getSignedTy(64), "main",
+        {{"argc", eisdrache->getSizeTy()}, {"argv", eisdrache->getUnsignedPtrPtrTy(8)}}, true);
+    eisdrache->createRet(root->generate(eisdrache));
+    eisdrache->dump();
 
     return 0;
 }

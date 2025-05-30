@@ -7,7 +7,7 @@
 #include "operation.h"
 #include "./parser/value.h"
 
-class Expr : public StmtAST {
+class Expr : public Stmt {
 public:
     using Ptr = std::shared_ptr<Expr>;
     using Vec = std::vector<Ptr>;
@@ -19,6 +19,8 @@ public:
 
     BinaryExpr(const BinaryOp &op, Expr::Ptr LHS, Expr::Ptr RHS);
     ~BinaryExpr() override;
+
+    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] std::string str() const override;
 
@@ -41,6 +43,8 @@ private:
 class NumberExpr : public Expr {
 public:
     explicit NumberExpr(const std::string &value);
+
+    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] std::string str() const override;
 

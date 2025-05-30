@@ -1,8 +1,8 @@
 #include "parser.h"
 
-Parser::Parser(const Token::Vec &tokens) : root(std::make_shared<RootAST>()), tokens(tokens) {}
+Parser::Parser(const Token::Vec &tokens) : root(std::make_shared<Root>()), tokens(tokens) {}
 
-RootAST::Ptr Parser::parse() {
+Root::Ptr Parser::parse() {
     it = tokens.begin();
 
     while (it != tokens.end())
@@ -11,7 +11,7 @@ RootAST::Ptr Parser::parse() {
     return root;
 }
 
-StmtAST::Ptr Parser::parseStmt() { return parseExpr(); }
+Stmt::Ptr Parser::parseStmt() { return parseExpr(); }
 
 Expr::Ptr Parser::parseExpr() { return parseAdditiveExpr(); }
 
@@ -27,19 +27,29 @@ Expr::Ptr Parser::parseAdditiveExpr() {
 }
 
 Expr::Ptr Parser::parseMultiplicativeExpr() {
-    Expr::Ptr LHS = parsePrimaryExpr();
+    Expr::Ptr LHS = parsePowerExpr();
 
     while (*it == ASTERISK || *it == SLASH) {
         auto op = eat() == ASTERISK ? BinaryOp::MUL : BinaryOp::DIV;
-        LHS = std::make_shared<BinaryExpr>(op, LHS, parsePrimaryExpr());
+        LHS = std::make_shared<BinaryExpr>(op, LHS, parsePowerExpr());
     }
 
     return LHS;
 }
 
+Expr::Ptr Parser::parsePowerExpr() {
+    Expr::Ptr LHS = parsePrimaryExpr();
+
+    while (eat(CARET))
+        LHS = std::make_shared<BinaryExpr>(BinaryOp::POW, LHS, parsePrimaryExpr());
+
+    return LHS;
+}
+
+
 Expr::Ptr Parser::parsePrimaryExpr() {
     switch (it->getType()) {
-        case IDENTIFIER: return std::make_shared<SymbolExpr>(eat().getValue());
+        // FIXME: case IDENTIFIER: return std::make_shared<SymbolExpr>(eat().getValue());
         case NUMBER: return std::make_shared<NumberExpr>(eat().getValue());
 
         default: return nullptr;
@@ -51,4 +61,13 @@ constexpr const Token &Parser::eat() {
         return *it++;
 
     return *it;
+}
+
+constexpr bool Parser::eat(TokenType type) {
+    if (it != tokens.end() && *it == type) {
+        ++it;
+        return true;
+    }
+
+    return false;
 }

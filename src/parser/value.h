@@ -4,6 +4,7 @@
 #include <string>
 
 #include "type.h"
+#include "../eisdrache/src/eisdrache.hpp"
 
 class Value {
 public:
@@ -13,6 +14,9 @@ public:
     explicit Value(const double &value);
 
     ~Value();
+
+    [[nodiscard]] const Type::Ptr &getType() const;
+    [[nodiscard]] llvm::Eisdrache::Local &getLLVMValue(llvm::Eisdrache::Ptr context) const;
 
     [[nodiscard]] std::string str() const;
 

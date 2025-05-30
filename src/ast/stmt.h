@@ -2,26 +2,33 @@
 
 #include <memory>
 #include <vector>
+#include "../eisdrache/src/eisdrache.hpp"
 
-class StmtAST {
+using llvm::Eisdrache;
+
+class Stmt {
 public:
-    using Ptr = std::shared_ptr<StmtAST>;
+    using Ptr = std::shared_ptr<Stmt>;
     using Vec = std::vector<Ptr>;
 
-    virtual ~StmtAST();
+    virtual ~Stmt();
 
-    virtual std::string str() const = 0;
+    virtual Eisdrache::Local &generate(Eisdrache::Ptr context) = 0;
+
+    [[nodiscard]] virtual std::string str() const = 0;
 };
 
-class RootAST : public StmtAST {
+class Root : public Stmt {
 public:
-    using Ptr = std::shared_ptr<RootAST>;
+    using Ptr = std::shared_ptr<Root>;
 
-    RootAST();
-    ~RootAST() override;
+    Root();
+    ~Root() override;
 
-    void addStmt(StmtAST::Ptr stmt);
-    std::string str() const override;
+    void addStmt(Stmt::Ptr stmt);
+    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+
+    [[nodiscard]] std::string str() const override;
 
 private:
     Vec program;

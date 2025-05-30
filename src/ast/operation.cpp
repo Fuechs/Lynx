@@ -1,4 +1,5 @@
 #include "operation.h"
+#include "stmt.h"
 
 std::string BinaryOpValue(const BinaryOp &op) {
     switch (op) {
@@ -6,6 +7,7 @@ std::string BinaryOpValue(const BinaryOp &op) {
         case BinaryOp::SUB: return "-";
         case BinaryOp::MUL: return "*";
         case BinaryOp::DIV: return "/";
+        case BinaryOp::POW: return "^";
         default:            return "";
     }
 }

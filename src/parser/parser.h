@@ -7,19 +7,23 @@ class Parser {
 public:
     explicit Parser(const Token::Vec &tokens);
 
-    RootAST::Ptr parse();
+    Root::Ptr parse();
 
-    StmtAST::Ptr parseStmt();
+    Stmt::Ptr parseStmt();
 
     Expr::Ptr parseExpr();
     Expr::Ptr parseAdditiveExpr();
     Expr::Ptr parseMultiplicativeExpr();
+    Expr::Ptr parsePowerExpr();
     Expr::Ptr parsePrimaryExpr();
 
 private:
+    // advance to the next token and return the current
     constexpr const Token &eat();
+    // advance to the next token and return true if the current token is of the given type
+    constexpr bool eat(TokenType type);
 
-    RootAST::Ptr root;
+    Root::Ptr root;
     Token::Vec tokens;
     Token::Vec::const_iterator it;
 };

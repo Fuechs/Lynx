@@ -1,20 +1,29 @@
 #include <sstream>
 #include "stmt.h"
 
-StmtAST::~StmtAST() {}
+Stmt::~Stmt() = default;
 
-RootAST::RootAST() : program({}) {}
+Root::Root() : program({}) {}
 
-RootAST::~RootAST() { program.clear(); }
+Root::~Root() { program.clear(); }
 
-void RootAST::addStmt(StmtAST::Ptr stmt) {
+void Root::addStmt(Stmt::Ptr stmt) {
     program.push_back(std::move(stmt));
 }
 
-std::string RootAST::str() const {
+Eisdrache::Local &Root::generate(llvm::Eisdrache::Ptr context) {
+    Eisdrache::Local *ret = nullptr;
+
+    for (const auto &stmt : program)
+        ret = &stmt->generate(context);
+
+    return *ret; // might be temporary, added this for basic testing
+}
+
+std::string Root::str() const {
     std::stringstream ss;
 
-    for (auto &stmt : program)
+    for (const auto &stmt : program)
         ss << stmt->str() << '\n';
 
     return ss.str();
