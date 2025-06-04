@@ -80,6 +80,12 @@ public:
 
     [[nodiscard]] TokenType getType() const;
     [[nodiscard]] std::string getValue() const;
+    [[nodiscard]] size_t getLine() const;
+    [[nodiscard]] size_t getStart() const;
+    [[nodiscard]] size_t getEnd() const;
+
+    [[nodiscard]] static std::string getTypeName(TokenType type);
+    [[nodiscard]] static std::string getTypeValue(TokenType type);
 
 private:
     TokenType tokenType;

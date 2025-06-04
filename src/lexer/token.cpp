@@ -59,6 +59,65 @@ const char *tokenTypeNames[] = {
     "number",
 };
 
+const char *tokenTypeValues[] = {
+    "(",
+    ")",
+    "[",
+    "]",
+    "{",
+    "}",
+    ":",
+    ";",
+    ".",
+    ",",
+    "->",
+    "@",
+
+    "=",
+    "===",
+    "++",
+    "--",
+    "+=",
+    "-=",
+    "*=",
+    "/=",
+    "^=",
+    "%=",
+    "|=",
+    "&=",
+    "<<=",
+    ">>=",
+    "<>",
+
+    "==",
+    "!=",
+    "<=",
+    ">=",
+    "<",
+    ">",
+    "!",
+    "?",
+    "||",
+    "&&",
+
+    "+",
+    "-",
+    "*",
+    "/",
+    "^",
+    "%",
+
+    "~",
+    "|",
+    "><",
+    "&",
+    "<<",
+    ">>",
+
+    "identifier",
+    "number",
+};
+
 Token::Token(const TokenType &tokenType, const std::string &value, size_t line, size_t start, size_t end)
 : tokenType(tokenType), value(value), line(line), start(start), end(end) {}
 
@@ -74,3 +133,13 @@ std::string Token::str() const {
 TokenType Token::getType() const { return tokenType; }
 
 std::string Token::getValue() const { return value; }
+
+size_t Token::getLine() const { return line; }
+
+size_t Token::getStart() const { return start; }
+
+size_t Token::getEnd() const { return end; }
+
+std::string Token::getTypeName(TokenType type) { return tokenTypeNames[type]; }
+
+std::string Token::getTypeValue(TokenType type) { return tokenTypeValues[type]; }

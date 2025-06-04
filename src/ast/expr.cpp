@@ -19,7 +19,15 @@ Eisdrache::Local &BinaryExpr::generate(Eisdrache::Ptr context) {
         case BinaryOp::SUB: return context->binaryOp(Eisdrache::SUB, L, R);
         case BinaryOp::MUL: return context->binaryOp(Eisdrache::MUL, L, R);
         case BinaryOp::DIV: return context->binaryOp(Eisdrache::DIV, L, R);
-        // TODO: BinaryOp::POW
+        case BinaryOp::POW: {
+            Eisdrache::Local &FL = context->typeCast(L, context->getFloatTy(64));
+            Eisdrache::Local &FR = context->typeCast(R, context->getFloatTy(64));
+
+            llvm::Function *powFunc = llvm::Intrinsic::getOrInsertDeclaration(context->getModule(), llvm::Intrinsic::pow, context->getFloatTy(64)->getTy());
+            llvm::Value *ret = context->getBuilder()->CreateCall(powFunc, {FL.getValuePtr(), FR.getValuePtr()});
+            Eisdrache::Local &ret_local = context->getCurrentParent().addLocal(Eisdrache::Local(context, context->getFloatTy(64), ret));
+            return context->typeCast(ret_local, context->getSignedTy(64));
+        }
         default:            return context->getNull();
     }
 }

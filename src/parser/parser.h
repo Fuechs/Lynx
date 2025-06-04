@@ -5,7 +5,7 @@
 
 class Parser {
 public:
-    explicit Parser(const Token::Vec &tokens);
+    explicit Parser(Token::Vec tokens);
 
     Root::Ptr parse();
 
@@ -22,6 +22,8 @@ private:
     constexpr const Token &eat();
     // advance to the next token and return true if the current token is of the given type
     constexpr bool eat(TokenType type);
+    // advance to the next token if the token is of the given type, throw error otherwise
+    const Token &expect(TokenType type);
 
     Root::Ptr root;
     Token::Vec tokens;

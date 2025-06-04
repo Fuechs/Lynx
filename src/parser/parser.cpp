@@ -1,6 +1,8 @@
 #include "parser.h"
 
-Parser::Parser(const Token::Vec &tokens) : root(std::make_shared<Root>()), tokens(tokens) {}
+#include <utility>
+
+Parser::Parser(Token::Vec tokens) : root(std::make_shared<Root>()), tokens(std::move(tokens)) {}
 
 Root::Ptr Parser::parse() {
     it = tokens.begin();
@@ -51,6 +53,12 @@ Expr::Ptr Parser::parsePrimaryExpr() {
     switch (it->getType()) {
         // FIXME: case IDENTIFIER: return std::make_shared<SymbolExpr>(eat().getValue());
         case NUMBER: return std::make_shared<NumberExpr>(eat().getValue());
+        case LPAREN: {
+            ++it;
+            Expr::Ptr expr = parseExpr();
+            expect(RPAREN);
+            return expr;
+        }
 
         default: return nullptr;
     }
@@ -70,4 +78,15 @@ constexpr bool Parser::eat(TokenType type) {
     }
 
     return false;
+}
+
+const Token &Parser::expect(TokenType type) {
+    if (it == tokens.end() || *it != type)
+        // TODO: proper errors
+        std::cerr << "Expected '"+Token::getTypeName(type)+"' at line " << it->getLine() << ":" << it->getStart() << std::endl;
+
+    if (it != tokens.end())
+        ++it;
+
+    return *it;
 }
