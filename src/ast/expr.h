@@ -13,6 +13,20 @@ public:
     using Vec = std::vector<Ptr>;
 };
 
+class BlockExpr : public Expr {
+public:
+    explicit BlockExpr(Stmt::Vec stmts);
+    ~BlockExpr() override;
+
+    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+
+    [[nodiscard]] std::string str() const override;
+
+private:
+    Stmt::Vec stmts;
+    bool yieldsValue; // is the block supposed to yield a value (expression)?
+};
+
 class BinaryExpr : public Expr {
 public:
     using Ptr = std::shared_ptr<BinaryExpr>;

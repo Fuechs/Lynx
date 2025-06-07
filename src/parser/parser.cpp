@@ -15,7 +15,25 @@ Root::Ptr Parser::parse() {
 
 Stmt::Ptr Parser::parseStmt() { return parseExpr(); }
 
-Expr::Ptr Parser::parseExpr() { return parseAdditiveExpr(); }
+Expr::Ptr Parser::parseExpr() { return parseBlockExpr(); }
+
+Expr::Ptr Parser::parseBlockExpr() {
+    if (eat(LBRACE)) {
+        Stmt::Vec stmts = {};
+
+        while (!eat(RBRACE))
+            if (it == tokens.end())
+                std::cerr << "Expected '}' at line " << it->getLine() << ":" << it->getStart() << std::endl;
+            else {
+                stmts.push_back(parseStmt());
+                expect(SEMICOLON);
+            }
+
+        return std::make_shared<BlockExpr>(stmts);
+    }
+
+    return parseAdditiveExpr();
+}
 
 Expr::Ptr Parser::parseAdditiveExpr() {
     Expr::Ptr LHS = parseMultiplicativeExpr();
@@ -83,7 +101,7 @@ constexpr bool Parser::eat(TokenType type) {
 const Token &Parser::expect(TokenType type) {
     if (it == tokens.end() || *it != type)
         // TODO: proper errors
-        std::cerr << "Expected '"+Token::getTypeName(type)+"' at line " << it->getLine() << ":" << it->getStart() << std::endl;
+        std::cerr << "Expected '"+Token::getTypeValue(type)+"' at line " << it->getLine() << ":" << it->getStart() << std::endl;
 
     if (it != tokens.end())
         ++it;

@@ -22,7 +22,7 @@ int main() {
     eisdrache->declareFunction(eisdrache->getSignedTy(64), "main",
         {{"argc", eisdrache->getSizeTy()}, {"argv", eisdrache->getUnsignedPtrPtrTy(8)}}, true);
     eisdrache->createRet(root->generate(eisdrache));
-    eisdrache->dump();
+    eisdrache->dump("src/test/test.ll");
 
     return 0;
 }

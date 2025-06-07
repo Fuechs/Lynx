@@ -3,6 +3,39 @@
 
 #include "expr.h"
 
+#include <sstream>
+
+// BLOCK EXPR
+
+BlockExpr::BlockExpr(Stmt::Vec stmts) : stmts(std::move(stmts)), yieldsValue(false) {}
+
+BlockExpr::~BlockExpr() { stmts.clear(); }
+
+Eisdrache::Local &BlockExpr::generate(Eisdrache::Ptr context) {
+    Eisdrache::Local *ret = &context->getNull();
+
+    for (const auto &stmt : stmts)
+        ret = &stmt->generate(context);
+
+    return *ret;
+}
+
+std::string BlockExpr::str() const {
+    std::stringstream ss;
+    ss << "{";
+
+    if (stmts.size() == 1)
+        ss << " " << stmts[0]->str() << "; }";
+    else {
+        for (const auto &stmt : stmts)
+            ss << "\n" << stmt->str() << ";";
+        ss << "\n}";
+    }
+
+    return ss.str();
+}
+
+
 // BINARY EXPR
 
 BinaryExpr::BinaryExpr(const BinaryOp &op, Expr::Ptr LHS, Expr::Ptr RHS)
