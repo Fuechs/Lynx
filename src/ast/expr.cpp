@@ -5,6 +5,24 @@
 
 #include <sstream>
 
+// ASSIGNMENT EXPR
+
+AssignmentExpr::AssignmentExpr(Ptr assignee, Ptr value)
+: assignee(std::move(assignee)), value(std::move(value)) {}
+
+AssignmentExpr::~AssignmentExpr() = default;
+
+Eisdrache::Local &AssignmentExpr::generate(Eisdrache::Ptr context) {
+    Eisdrache::Local &L = assignee->generate(context);
+    Eisdrache::Local &R = value->generate(context);
+    context->storeValue(L, R);
+    return L;
+}
+
+std::string AssignmentExpr::str() const {
+    return std::format("{} = {}", assignee->str(), value->str());
+}
+
 // BLOCK EXPR
 
 BlockExpr::BlockExpr(Stmt::Vec stmts) : stmts(std::move(stmts)), yieldsValue(false) {}
@@ -22,10 +40,10 @@ Eisdrache::Local &BlockExpr::generate(Eisdrache::Ptr context) {
 
 std::string BlockExpr::str() const {
     std::stringstream ss;
-    ss << "{";
+    ss << "{ ";
 
     if (stmts.size() == 1)
-        ss << " " << stmts[0]->str() << "; }";
+        ss << stmts[0]->str() << "; }";
     else {
         for (const auto &stmt : stmts)
             ss << "\n" << stmt->str() << ";";
@@ -74,6 +92,10 @@ std::string BinaryExpr::str() const {
 SymbolExpr::SymbolExpr(std::string name) : name(std::move(name)) {}
 
 SymbolExpr::~SymbolExpr() { name.clear(); }
+
+Eisdrache::Local &SymbolExpr::generate(Eisdrache::Ptr context) {
+    return context->getCurrentParent()[name];
+}
 
 std::string SymbolExpr::str() const { return name; }
 

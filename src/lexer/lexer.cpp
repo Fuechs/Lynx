@@ -23,7 +23,7 @@ const std::vector<std::pair<TokenType, std::regex>> patterns = {
     {MINUS_EQUALS, std::regex(R"(-=)")},
     {ASTERISK_EQUALS, std::regex(R"(\*=)")},
     {SLASH_EQUALS, std::regex(R"(/=)")},
-    {CARET_EQUALS, std::regex(R"(^=)")},
+    {CARET_EQUALS, std::regex(R"(\^=)")},
     {PERCENT_EQUALS, std::regex(R"(%=)")},
     {OR_EQUALS, std::regex(R"(\|=)")},
     {AND_EQUALS, std::regex(R"(&=)")},
@@ -96,7 +96,7 @@ Token::Vec Lexer::lex() const {
 
                 try {
                     if (std::regex_search(remaining, match, pattern, std::regex_constants::match_continuous)) {
-                        tokens.emplace_back(tokenType, match.str(), line, pos, pos + match.length() - 1);
+                        tokens.emplace_back(tokenType, match.str(), line, pos + 1, pos + match.length());
                         pos += match.length();
                         matched = true;
                         break;

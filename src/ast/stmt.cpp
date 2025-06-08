@@ -15,7 +15,10 @@ Eisdrache::Local &Root::generate(llvm::Eisdrache::Ptr context) {
     Eisdrache::Local *ret = nullptr;
 
     for (const auto &stmt : program)
-        ret = &stmt->generate(context);
+        if (!stmt)
+            std::cerr << "Encountered null stmt during generation." << std::endl;
+        else
+            ret = &stmt->generate(context);
 
     return *ret; // might be temporary, added this for basic testing
 }
@@ -24,7 +27,10 @@ std::string Root::str() const {
     std::stringstream ss;
 
     for (const auto &stmt : program)
-        ss << stmt->str() << '\n';
+        if (!stmt)
+            ss << "NULL_AST;\n";
+        else
+            ss << stmt->str() << '\n';
 
     return ss.str();
 }

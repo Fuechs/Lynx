@@ -1,5 +1,7 @@
 #include "token.h"
 
+#include <utility>
+
 const char *tokenTypeNames[] = {
     "lparen",
     "rparen",
@@ -118,8 +120,8 @@ const char *tokenTypeValues[] = {
     "number",
 };
 
-Token::Token(const TokenType &tokenType, const std::string &value, size_t line, size_t start, size_t end)
-: tokenType(tokenType), value(value), line(line), start(start), end(end) {}
+Token::Token(const TokenType &tokenType, std::string value, size_t line, size_t start, size_t end)
+: tokenType(tokenType), value(std::move(value)), line(line), start(start), end(end) {}
 
 Token::~Token() { value.clear(); }
 

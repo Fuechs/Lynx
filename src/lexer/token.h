@@ -71,7 +71,7 @@ class Token {
 public:
     using Vec = std::vector<Token>;
 
-    Token(const TokenType &tokenType, const std::string &value, size_t line, size_t start, size_t end);
+    Token(const TokenType &tokenType, std::string value, size_t line, size_t start, size_t end);
     ~Token();
 
     bool operator==(TokenType type) const;

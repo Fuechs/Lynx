@@ -13,6 +13,20 @@ public:
     using Vec = std::vector<Ptr>;
 };
 
+class AssignmentExpr : public Expr {
+public:
+    explicit AssignmentExpr(Ptr assignee, Ptr value);
+    ~AssignmentExpr() override;
+
+    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+
+    [[nodiscard]] constexpr AST kind() const override { return AST::Assignment; }
+    [[nodiscard]] std::string str() const override;
+
+private:
+    Ptr assignee, value;
+};
+
 class BlockExpr : public Expr {
 public:
     explicit BlockExpr(Stmt::Vec stmts);
@@ -20,6 +34,7 @@ public:
 
     Eisdrache::Local &generate(Eisdrache::Ptr context) override;
 
+    [[nodiscard]] constexpr AST kind() const override { return AST::Block; }
     [[nodiscard]] std::string str() const override;
 
 private:
@@ -36,6 +51,7 @@ public:
 
     Eisdrache::Local &generate(Eisdrache::Ptr context) override;
 
+    [[nodiscard]] constexpr AST kind() const override { return AST::Binary; }
     [[nodiscard]] std::string str() const override;
 
 private:
@@ -48,6 +64,9 @@ public:
     explicit SymbolExpr(std::string name);
     ~SymbolExpr() override;
 
+    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+
+    [[nodiscard]] constexpr AST kind() const override { return AST::Symbol; }
     [[nodiscard]] std::string str() const override;
 
 private:
@@ -60,6 +79,7 @@ public:
 
     Eisdrache::Local &generate(Eisdrache::Ptr context) override;
 
+    [[nodiscard]] constexpr AST kind() const override { return AST::Number; }
     [[nodiscard]] std::string str() const override;
 
 private:

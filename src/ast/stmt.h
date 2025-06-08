@@ -6,6 +6,17 @@
 
 using llvm::Eisdrache;
 
+enum class AST {
+    Stmt,
+    Root,
+    Expr,
+    Assignment,
+    Block,
+    Binary,
+    Symbol,
+    Number,
+};
+
 class Stmt {
 public:
     using Ptr = std::shared_ptr<Stmt>;
@@ -15,6 +26,7 @@ public:
 
     virtual Eisdrache::Local &generate(Eisdrache::Ptr context) = 0;
 
+    [[nodiscard]] virtual constexpr AST kind() const { return AST::Stmt; }
     [[nodiscard]] virtual std::string str() const = 0;
 };
 
@@ -26,8 +38,10 @@ public:
     ~Root() override;
 
     void addStmt(Stmt::Ptr stmt);
+
     Eisdrache::Local &generate(Eisdrache::Ptr context) override;
 
+    [[nodiscard]] constexpr AST kind() const override { return AST::Root; }
     [[nodiscard]] std::string str() const override;
 
 private:

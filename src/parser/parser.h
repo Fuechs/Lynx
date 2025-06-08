@@ -12,6 +12,7 @@ public:
     Stmt::Ptr parseStmt();
 
     Expr::Ptr parseExpr();
+    Expr::Ptr parseAssignmentExpr();
     Expr::Ptr parseBlockExpr();
     Expr::Ptr parseAdditiveExpr();
     Expr::Ptr parseMultiplicativeExpr();

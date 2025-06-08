@@ -7,15 +7,29 @@ Parser::Parser(Token::Vec tokens) : root(std::make_shared<Root>()), tokens(std::
 Root::Ptr Parser::parse() {
     it = tokens.begin();
 
+    Stmt::Ptr stmt;
     while (it != tokens.end())
-        root->addStmt(parseStmt());
+        if ((stmt = parseStmt())) { // check if stmt isn't null
+            if (stmt->kind() != AST::Block) // expect ';' after stmt
+                expect(SEMICOLON);
+            root->addStmt(stmt);
+        }
 
     return root;
 }
 
 Stmt::Ptr Parser::parseStmt() { return parseExpr(); }
 
-Expr::Ptr Parser::parseExpr() { return parseBlockExpr(); }
+Expr::Ptr Parser::parseExpr() { return parseAssignmentExpr(); }
+
+Expr::Ptr Parser::parseAssignmentExpr() {
+    Expr::Ptr LHS = parseBlockExpr();
+
+    if (LHS && LHS->kind() == AST::Symbol && eat(EQUALS))
+        return std::make_shared<AssignmentExpr>(LHS ,parseExpr());
+
+    return LHS;
+}
 
 Expr::Ptr Parser::parseBlockExpr() {
     if (eat(LBRACE)) {
@@ -26,7 +40,8 @@ Expr::Ptr Parser::parseBlockExpr() {
                 std::cerr << "Expected '}' at line " << it->getLine() << ":" << it->getStart() << std::endl;
             else {
                 stmts.push_back(parseStmt());
-                expect(SEMICOLON);
+                if (stmts.back()->kind() != AST::Block)
+                    expect(SEMICOLON);
             }
 
         return std::make_shared<BlockExpr>(stmts);
@@ -69,7 +84,7 @@ Expr::Ptr Parser::parsePowerExpr() {
 
 Expr::Ptr Parser::parsePrimaryExpr() {
     switch (it->getType()) {
-        // FIXME: case IDENTIFIER: return std::make_shared<SymbolExpr>(eat().getValue());
+        case IDENTIFIER: return std::make_shared<SymbolExpr>(eat().getValue());
         case NUMBER: return std::make_shared<NumberExpr>(eat().getValue());
         case LPAREN: {
             ++it;
@@ -78,7 +93,11 @@ Expr::Ptr Parser::parsePrimaryExpr() {
             return expr;
         }
 
-        default: return nullptr;
+        default: {
+            std::cerr << "Unexpected token '" << it->getValue() << "' at line " << it->getLine() << ":" << it->getStart() << std::endl;
+            eat();
+            return nullptr;
+        }
     }
 }
 
