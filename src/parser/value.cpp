@@ -7,7 +7,7 @@ Value::~Value() {}
 
 const Type::Ptr &Value::getType() const { return type; }
 
-llvm::Eisdrache::Local &Value::getLLVMValue(llvm::Eisdrache::Ptr context) const {
+llvm::Eisdrache::Local &Value::generate(llvm::Eisdrache::Ptr context) const {
     using llvm::Eisdrache;
 
     Eisdrache::Local local;

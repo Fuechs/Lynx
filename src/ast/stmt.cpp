@@ -1,7 +1,12 @@
 #include <sstream>
 #include "stmt.h"
+#include "expr.h"
+
+// STMT
 
 Stmt::~Stmt() = default;
+
+// ROOT
 
 Root::Root() : program({}) {}
 
@@ -31,6 +36,36 @@ std::string Root::str() const {
             ss << "NULL_AST;\n";
         else
             ss << stmt->str() << '\n';
+
+    return ss.str();
+}
+
+// VARIABLESTMT
+
+VariableStmt::VariableStmt(std::string symbol, Type::Ptr type, std::shared_ptr<Expr> value)
+: symbol(std::move(symbol)), type(std::move(type)), value(std::move(value)) {}
+
+VariableStmt::~VariableStmt() { symbol.clear(); }
+
+Eisdrache::Local &VariableStmt::generate(Eisdrache::Ptr context) {
+    llvm::Value *value = this->value->generate(context).getValuePtr();
+    return context->declareLocal(context->getSignedTy(64), symbol, value);
+}
+
+
+std::string VariableStmt::str() const {
+    std::stringstream ss;
+    ss << symbol;
+
+    if (type) {
+        if (!type->isReference())
+            ss << ": ";
+
+        ss << type->str();
+    }
+
+    if (value)
+        ss << (type ? " = " : " := ") << value->str();
 
     return ss.str();
 }

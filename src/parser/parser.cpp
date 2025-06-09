@@ -18,7 +18,22 @@ Root::Ptr Parser::parse() {
     return root;
 }
 
-Stmt::Ptr Parser::parseStmt() { return parseExpr(); }
+Stmt::Ptr Parser::parseStmt() { return parseVariableStmt(); }
+
+Stmt::Ptr Parser::parseVariableStmt() {
+    if (*it == IDENTIFIER && (peek() == COLON || peek() == POINTER)) {
+        std::string symbol = eat().getValue();
+        Type::Ptr type = parseType();
+        Expr::Ptr value = nullptr;
+
+        if (eat(EQUALS))
+            value = parseExpr();
+
+        return std::make_shared<VariableStmt>(symbol, type, value);
+    }
+
+    return parseExpr();
+}
 
 Expr::Ptr Parser::parseExpr() { return parseAssignmentExpr(); }
 
@@ -101,6 +116,25 @@ Expr::Ptr Parser::parsePrimaryExpr() {
     }
 }
 
+Type::Ptr Parser::parseType() {
+    Type::Ptr type = nullptr;
+    const bool reference = eat() == POINTER;
+
+    if (*it == IDENTIFIER) {
+        type = Type::create(eat());
+
+        while (eat(ASTERISK))
+            type = std::make_shared<PointerType>(type);
+    } else
+        type = std::make_shared<Type>(Type::AUTO);
+
+    if (reference) // TODO: handle this
+        std::cerr << "References aren't implemented yet." << std::endl;
+
+    return type;
+}
+
+
 constexpr const Token &Parser::eat() {
     if (it != tokens.end())
         return *it++;
@@ -115,6 +149,10 @@ constexpr bool Parser::eat(TokenType type) {
     }
 
     return false;
+}
+
+constexpr const Token &Parser::peek(int offset) const {
+    return *(it+offset);
 }
 
 const Token &Parser::expect(TokenType type) {

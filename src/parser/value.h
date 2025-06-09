@@ -16,7 +16,7 @@ public:
     ~Value();
 
     [[nodiscard]] const Type::Ptr &getType() const;
-    [[nodiscard]] llvm::Eisdrache::Local &getLLVMValue(llvm::Eisdrache::Ptr context) const;
+    [[nodiscard]] llvm::Eisdrache::Local &generate(llvm::Eisdrache::Ptr context) const;
 
     [[nodiscard]] std::string str() const;
 

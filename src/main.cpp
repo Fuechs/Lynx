@@ -21,7 +21,6 @@ int main() {
 
     eisdrache->declareFunction(eisdrache->getSignedTy(64), "main",
         {{"argc", eisdrache->getSizeTy()}, {"argv", eisdrache->getUnsignedPtrPtrTy(8)}}, true);
-    eisdrache->declareLocal(eisdrache->getSignedTy(64), "a");
     eisdrache->createRet(root->generate(eisdrache));
     eisdrache->dump("src/test/test.ll");
 

@@ -108,6 +108,6 @@ NumberExpr::NumberExpr(const std::string &value) {
         this->value = std::make_shared<Value>(std::stoll(value));
 }
 
-Eisdrache::Local &NumberExpr::generate(Eisdrache::Ptr context) { return value->getLLVMValue(context); }
+Eisdrache::Local &NumberExpr::generate(Eisdrache::Ptr context) { return value->generate(context); }
 
 std::string NumberExpr::str() const { return value->str(); }

@@ -10,6 +10,7 @@ public:
     Root::Ptr parse();
 
     Stmt::Ptr parseStmt();
+    Stmt::Ptr parseVariableStmt();
 
     Expr::Ptr parseExpr();
     Expr::Ptr parseAssignmentExpr();
@@ -19,6 +20,8 @@ public:
     Expr::Ptr parsePowerExpr();
     Expr::Ptr parsePrimaryExpr();
 
+    Type::Ptr parseType();
+
 private:
     // advance to the next token and return the current
     constexpr const Token &eat();
@@ -26,6 +29,8 @@ private:
     constexpr bool eat(TokenType type);
     // advance to the next token if the token is of the given type, throw error otherwise
     const Token &expect(TokenType type);
+    // peek to the next token, further or back (does not check for EOF)
+    [[nodiscard]] constexpr const Token &peek(int offset = 1) const;
 
     Root::Ptr root;
     Token::Vec tokens;
