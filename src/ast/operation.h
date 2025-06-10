@@ -3,7 +3,7 @@
 #include <string>
 #include "../eisdrache/src/eisdrache.hpp"
 
-enum class BinaryOp {
+enum BinaryOp {
     ADD,    // addition
     SUB,    // subtraction
     MUL,    // multiplication
@@ -11,4 +11,20 @@ enum class BinaryOp {
     POW,    // power
 };
 
-std::string BinaryOpValue(const BinaryOp &op);
+enum UnaryOp {
+    DEREF,   // dereference
+};
+
+inline const char *BinaryOpValue[] = {
+    "+",
+    "-",
+    "*",
+    "/",
+    "^",
+    "/",
+    "^",
+};
+
+inline const char *UnaryOpValue[] = {
+    "*",
+};

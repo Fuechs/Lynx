@@ -56,7 +56,7 @@ std::string BlockExpr::str() const {
 
 // BINARY EXPR
 
-BinaryExpr::BinaryExpr(const BinaryOp &op, Expr::Ptr LHS, Expr::Ptr RHS)
+BinaryExpr::BinaryExpr(const BinaryOp &op, Ptr LHS, Ptr RHS)
 : op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
 
 BinaryExpr::~BinaryExpr() = default;
@@ -65,12 +65,13 @@ Eisdrache::Local &BinaryExpr::generate(Eisdrache::Ptr context) {
     Eisdrache::Local &L = LHS->generate(context);
     Eisdrache::Local &R = RHS->generate(context);
 
+
     switch (op) {
-        case BinaryOp::ADD: return context->binaryOp(Eisdrache::ADD, L, R);
-        case BinaryOp::SUB: return context->binaryOp(Eisdrache::SUB, L, R);
-        case BinaryOp::MUL: return context->binaryOp(Eisdrache::MUL, L, R);
-        case BinaryOp::DIV: return context->binaryOp(Eisdrache::DIV, L, R);
-        case BinaryOp::POW: {
+        case ADD: return context->binaryOp(Eisdrache::ADD, L, R);
+        case SUB: return context->binaryOp(Eisdrache::SUB, L, R);
+        case MUL: return context->binaryOp(Eisdrache::MUL, L, R);
+        case DIV: return context->binaryOp(Eisdrache::DIV, L, R);
+        case POW: {
             Eisdrache::Local &FL = context->typeCast(L, context->getFloatTy(64));
             Eisdrache::Local &FR = context->typeCast(R, context->getFloatTy(64));
 
@@ -84,8 +85,26 @@ Eisdrache::Local &BinaryExpr::generate(Eisdrache::Ptr context) {
 }
 
 std::string BinaryExpr::str() const {
-    return "(" + LHS->str() + " " + BinaryOpValue(op) + " " + RHS->str() + ")";
+    return "(" + LHS->str() + " " + BinaryOpValue[op]  + " " + RHS->str() + ")";
 }
+
+// UNARY EXPR
+
+UnaryExpr::UnaryExpr(const UnaryOp &op, Ptr expr) : op(op), expr(std::move(expr)) {}
+
+UnaryExpr::~UnaryExpr() = default;
+
+Eisdrache::Local &UnaryExpr::generate(Eisdrache::Ptr context) {
+    switch (op) {
+        case DEREF: return expr->generate(context).dereference();
+        default:    return expr->generate(context);
+    }
+}
+
+std::string UnaryExpr::str() const {
+    return std::string(UnaryOpValue[op]) + "(" + expr->str() + ")";
+}
+
 
 // SYMBOL EXPR
 

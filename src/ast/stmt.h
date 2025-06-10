@@ -16,6 +16,7 @@ enum class AST {
     Assignment,
     Block,
     Binary,
+    Unary,
     Symbol,
     Number,
 };

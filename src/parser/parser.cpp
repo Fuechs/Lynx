@@ -40,7 +40,7 @@ Expr::Ptr Parser::parseExpr() { return parseAssignmentExpr(); }
 Expr::Ptr Parser::parseAssignmentExpr() {
     Expr::Ptr LHS = parseBlockExpr();
 
-    if (LHS && LHS->kind() == AST::Symbol && eat(EQUALS))
+    if (LHS && eat(EQUALS))
         return std::make_shared<AssignmentExpr>(LHS ,parseExpr());
 
     return LHS;
@@ -69,7 +69,7 @@ Expr::Ptr Parser::parseAdditiveExpr() {
     Expr::Ptr LHS = parseMultiplicativeExpr();
 
     while (*it == PLUS || *it == MINUS) {
-        auto op = eat() == PLUS ? BinaryOp::ADD : BinaryOp::SUB;
+        auto op = eat() == PLUS ? ADD : SUB;
         LHS = std::make_shared<BinaryExpr>(op, LHS, parseMultiplicativeExpr());
     }
 
@@ -80,7 +80,7 @@ Expr::Ptr Parser::parseMultiplicativeExpr() {
     Expr::Ptr LHS = parsePowerExpr();
 
     while (*it == ASTERISK || *it == SLASH) {
-        auto op = eat() == ASTERISK ? BinaryOp::MUL : BinaryOp::DIV;
+        auto op = eat() == ASTERISK ? MUL : DIV;
         LHS = std::make_shared<BinaryExpr>(op, LHS, parsePowerExpr());
     }
 
@@ -88,14 +88,20 @@ Expr::Ptr Parser::parseMultiplicativeExpr() {
 }
 
 Expr::Ptr Parser::parsePowerExpr() {
-    Expr::Ptr LHS = parsePrimaryExpr();
+    Expr::Ptr LHS = parseDereferenceExpr();
 
     while (eat(CARET))
-        LHS = std::make_shared<BinaryExpr>(BinaryOp::POW, LHS, parsePrimaryExpr());
+        LHS = std::make_shared<BinaryExpr>(POW, LHS, parseDereferenceExpr());
 
     return LHS;
 }
 
+Expr::Ptr Parser::parseDereferenceExpr() {
+    if (eat(ASTERISK))
+        return std::make_shared<UnaryExpr>(DEREF, parseDereferenceExpr());
+
+    return parsePrimaryExpr();
+}
 
 Expr::Ptr Parser::parsePrimaryExpr() {
     switch (it->getType()) {
@@ -107,7 +113,6 @@ Expr::Ptr Parser::parsePrimaryExpr() {
             expect(RPAREN);
             return expr;
         }
-
         default: {
             std::cerr << "Unexpected token '" << it->getValue() << "' at line " << it->getLine() << ":" << it->getStart() << std::endl;
             eat();
@@ -133,7 +138,6 @@ Type::Ptr Parser::parseType() {
 
     return type;
 }
-
 
 constexpr const Token &Parser::eat() {
     if (it != tokens.end())

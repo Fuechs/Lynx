@@ -44,9 +44,7 @@ private:
 
 class BinaryExpr : public Expr {
 public:
-    using Ptr = std::shared_ptr<BinaryExpr>;
-
-    BinaryExpr(const BinaryOp &op, Expr::Ptr LHS, Expr::Ptr RHS);
+    BinaryExpr(const BinaryOp &op, Ptr LHS, Ptr RHS);
     ~BinaryExpr() override;
 
     Eisdrache::Local &generate(Eisdrache::Ptr context) override;
@@ -56,7 +54,22 @@ public:
 
 private:
     BinaryOp op;
-    Expr::Ptr LHS, RHS;
+    Ptr LHS, RHS;
+};
+
+class UnaryExpr : public Expr {
+public:
+    UnaryExpr(const UnaryOp &op, Ptr expr);
+    ~UnaryExpr() override;
+
+    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+
+    [[nodiscard]] constexpr AST kind() const override { return AST::Unary; }
+    [[nodiscard]] std::string str() const override;
+
+private:
+    UnaryOp op;
+    Ptr expr;
 };
 
 class SymbolExpr : public Expr {

@@ -18,6 +18,7 @@ public:
     Expr::Ptr parseAdditiveExpr();
     Expr::Ptr parseMultiplicativeExpr();
     Expr::Ptr parsePowerExpr();
+    Expr::Ptr parseDereferenceExpr();
     Expr::Ptr parsePrimaryExpr();
 
     Type::Ptr parseType();

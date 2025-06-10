@@ -28,7 +28,7 @@ public:
     static std::string getKindValue(Kind kind);
     static Kind getKind(const std::string &kind);
 
-    // TODO: virtual Eisdrache::Local &generate(Eisdrache::Ptr context);
+    virtual Eisdrache::Ty::Ptr generate(Eisdrache::Ptr context);
 
     [[nodiscard]] virtual constexpr bool isInteger() const { return false; }
     [[nodiscard]] virtual constexpr bool isFloat() const { return false; }

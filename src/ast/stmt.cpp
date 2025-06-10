@@ -35,12 +35,12 @@ std::string Root::str() const {
         if (!stmt)
             ss << "NULL_AST;\n";
         else
-            ss << stmt->str() << '\n';
+            ss << stmt->str() << ";\n";
 
     return ss.str();
 }
 
-// VARIABLESTMT
+// VARIABLE STMT
 
 VariableStmt::VariableStmt(std::string symbol, Type::Ptr type, std::shared_ptr<Expr> value)
 : symbol(std::move(symbol)), type(std::move(type)), value(std::move(value)) {}
@@ -48,10 +48,9 @@ VariableStmt::VariableStmt(std::string symbol, Type::Ptr type, std::shared_ptr<E
 VariableStmt::~VariableStmt() { symbol.clear(); }
 
 Eisdrache::Local &VariableStmt::generate(Eisdrache::Ptr context) {
-    llvm::Value *value = this->value->generate(context).getValuePtr();
-    return context->declareLocal(context->getSignedTy(64), symbol, value);
+    llvm::Value *val = value ? value->generate(context).getValuePtr() : nullptr;
+    return context->declareLocal(type->generate(context), symbol, val);
 }
-
 
 std::string VariableStmt::str() const {
     std::stringstream ss;
