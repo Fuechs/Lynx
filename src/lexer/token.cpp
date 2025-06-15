@@ -59,6 +59,7 @@ const char *tokenTypeNames[] = {
 
     "identifier",
     "number",
+    "literal",
 };
 
 const char *tokenTypeValues[] = {
@@ -118,6 +119,7 @@ const char *tokenTypeValues[] = {
 
     "identifier",
     "number",
+    "literal",
 };
 
 Token::Token(const TokenType &tokenType, std::string value, size_t line, size_t start, size_t end)

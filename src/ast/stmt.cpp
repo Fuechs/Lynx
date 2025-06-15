@@ -16,16 +16,16 @@ void Root::addStmt(Stmt::Ptr stmt) {
     program.push_back(std::move(stmt));
 }
 
-Eisdrache::Local &Root::generate(llvm::Eisdrache::Ptr context) {
-    Eisdrache::Local *ret = nullptr;
+Eisdrache::Entity::Ptr Root::generate(llvm::Eisdrache::Ptr context) {
+    Eisdrache::Entity::Ptr ret = nullptr;
 
     for (const auto &stmt : program)
         if (!stmt)
             std::cerr << "Encountered null stmt during generation." << std::endl;
         else
-            ret = &stmt->generate(context);
+            ret = stmt->generate(context);
 
-    return *ret; // might be temporary, added this for basic testing
+    return ret; // might be temporary, added this for basic testing
 }
 
 std::string Root::str() const {
@@ -47,8 +47,10 @@ VariableStmt::VariableStmt(std::string symbol, Type::Ptr type, std::shared_ptr<E
 
 VariableStmt::~VariableStmt() { symbol.clear(); }
 
-Eisdrache::Local &VariableStmt::generate(Eisdrache::Ptr context) {
-    llvm::Value *val = value ? value->generate(context).getValuePtr() : nullptr;
+Eisdrache::Entity::Ptr VariableStmt::generate(Eisdrache::Ptr context) {
+    llvm::Value *val = value
+        ? std::static_pointer_cast<Eisdrache::Local>(value->generate(context))->getValuePtr()
+        : nullptr;
     return context->declareLocal(type->generate(context), symbol, val);
 }
 

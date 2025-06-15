@@ -9,6 +9,7 @@ const std::vector<std::pair<TokenType, std::regex>> patterns = {
     // undefined length
     {NUMBER, std::regex(R"(\d*\.\d+|\d+)")},
     {IDENTIFIER, std::regex(R"([a-zA-Z_]\w*)")},
+    {LITERAL, std::regex(R"(\".*\")")}, // std::regex doesn't support lookbehind
 
     // three characters
     {TRIPLE_EQUALS, std::regex(R"(===)")},
@@ -79,8 +80,11 @@ Token::Vec Lexer::lex() const {
 
     while (std::getline(stream, current_line)) {
         size_t pos = 0;
-        
+
         while (pos < current_line.length()) {
+            if (current_line[pos] == '/' && pos + 1 < current_line.length() && current_line[pos + 1] == '/')
+                break;
+
             // Skip whitespace
             while (pos < current_line.length() && std::isspace(current_line[pos]))
                 pos++;
@@ -96,7 +100,13 @@ Token::Vec Lexer::lex() const {
 
                 try {
                     if (std::regex_search(remaining, match, pattern, std::regex_constants::match_continuous)) {
-                        tokens.emplace_back(tokenType, match.str(), line, pos + 1, pos + match.length());
+
+                        // Remove quotes from literal tokens (TODO: I should rewrite this whole Lexer)
+                        std::string value = match.str();
+                        if (tokenType == LITERAL)
+                            value = value.substr(1, match.str().length() - 2);
+
+                        tokens.emplace_back(tokenType, value, line, pos + 1, pos + match.length());
                         pos += match.length();
                         matched = true;
                         break;
@@ -113,6 +123,7 @@ Token::Vec Lexer::lex() const {
                 pos++;
             }
         }
+
         line++;
     }
 

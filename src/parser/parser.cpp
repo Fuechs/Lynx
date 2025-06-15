@@ -38,12 +38,30 @@ Stmt::Ptr Parser::parseVariableStmt() {
 Expr::Ptr Parser::parseExpr() { return parseAssignmentExpr(); }
 
 Expr::Ptr Parser::parseAssignmentExpr() {
-    Expr::Ptr LHS = parseBlockExpr();
+    Expr::Ptr LHS = parseCallExpr();
 
     if (LHS && eat(EQUALS))
         return std::make_shared<AssignmentExpr>(LHS ,parseExpr());
 
     return LHS;
+}
+
+
+Expr::Ptr Parser::parseCallExpr() {
+    Expr::Ptr callee = parseBlockExpr();
+
+    if (eat(LPAREN)) {
+        Expr::Vec args = {};
+
+        if (!eat(RPAREN)) {
+            do args.push_back(parseExpr()); while (eat(COMMA));
+            expect(RPAREN);
+        }
+
+        return std::make_shared<CallExpr>(callee, args);
+    }
+
+    return callee;
 }
 
 Expr::Ptr Parser::parseBlockExpr() {
@@ -106,7 +124,8 @@ Expr::Ptr Parser::parseDereferenceExpr() {
 Expr::Ptr Parser::parsePrimaryExpr() {
     switch (it->getType()) {
         case IDENTIFIER: return std::make_shared<SymbolExpr>(eat().getValue());
-        case NUMBER: return std::make_shared<NumberExpr>(eat().getValue());
+        case NUMBER:
+        case LITERAL: return std::make_shared<ValueExpr>(eat());
         case LPAREN: {
             ++it;
             Expr::Ptr expr = parseExpr();

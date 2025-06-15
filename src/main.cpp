@@ -19,9 +19,15 @@ int main() {
     Eisdrache::initialize();
     Eisdrache::Ptr eisdrache = Eisdrache::create("Lynx Compiler");
 
+    Eisdrache::Func::Ptr puts = eisdrache->declareFunction(eisdrache->getSignedTy(64),
+        "puts", {eisdrache->getUnsignedPtrTy(8)});
+    puts->addAttr(llvm::Attribute::NoCapture, 0);
+
+
     eisdrache->declareFunction(eisdrache->getSignedTy(64), "main",
         {{"argc", eisdrache->getSizeTy()}, {"argv", eisdrache->getUnsignedPtrPtrTy(8)}}, true);
-    eisdrache->createRet(root->generate(eisdrache));
+    root->generate(eisdrache);
+    eisdrache->createRet(eisdrache->getInt(64, 0));
     eisdrache->dump("src/test/test.ll");
 
     return 0;

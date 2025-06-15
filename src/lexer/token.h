@@ -65,6 +65,7 @@ enum TokenType {
     // literals
     IDENTIFIER,
     NUMBER,
+    LITERAL,
 };
 
 class Token {

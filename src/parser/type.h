@@ -8,15 +8,17 @@
 
 using llvm::Eisdrache;
 
-class Type {
+class Type : public std::enable_shared_from_this<Type> {
 public:
     using Ptr = std::shared_ptr<Type>;
     using Vec = std::vector<Ptr>;
 
     enum Kind {
+        U8,
         I64,
         F64,
         PTR,
+        LITERAL,
         AUTO,
     };
 
@@ -28,7 +30,9 @@ public:
     static std::string getKindValue(Kind kind);
     static Kind getKind(const std::string &kind);
 
-    virtual Eisdrache::Ty::Ptr generate(Eisdrache::Ptr context);
+    virtual Eisdrache::Ty::Ptr generate(const Eisdrache::Ptr &context);
+
+    Ptr getPointerTo(); // get PtrType to this type
 
     [[nodiscard]] virtual constexpr bool isInteger() const { return false; }
     [[nodiscard]] virtual constexpr bool isFloat() const { return false; }
@@ -44,6 +48,7 @@ protected:
     Kind kind;
 };
 
+// TODO: this class is unnecessary
 class IntType : public Type {
 public:
     using Ptr = std::shared_ptr<IntType>;
@@ -57,6 +62,7 @@ public:
     [[nodiscard]] std::string str() const override;
 };
 
+// TODO: this class is unnecessary
 class FloatType : public Type {
 public:
     using Ptr = std::shared_ptr<FloatType>;

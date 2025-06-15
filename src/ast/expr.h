@@ -18,7 +18,7 @@ public:
     explicit AssignmentExpr(Ptr assignee, Ptr value);
     ~AssignmentExpr() override;
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Assignment; }
     [[nodiscard]] std::string str() const override;
@@ -32,7 +32,7 @@ public:
     explicit BlockExpr(Stmt::Vec stmts);
     ~BlockExpr() override;
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Block; }
     [[nodiscard]] std::string str() const override;
@@ -42,12 +42,27 @@ private:
     bool yieldsValue; // is the block supposed to yield a value (expression)?
 };
 
+class CallExpr : public Expr {
+public:
+    CallExpr(Ptr callee, Vec args);
+    ~CallExpr() override;
+
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+
+    [[nodiscard]] constexpr AST kind() const override { return AST::Call; }
+    [[nodiscard]] std::string str() const override;
+
+private:
+    Ptr callee;
+    Vec args;
+};
+
 class BinaryExpr : public Expr {
 public:
     BinaryExpr(const BinaryOp &op, Ptr LHS, Ptr RHS);
     ~BinaryExpr() override;
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Binary; }
     [[nodiscard]] std::string str() const override;
@@ -62,7 +77,7 @@ public:
     UnaryExpr(const UnaryOp &op, Ptr expr);
     ~UnaryExpr() override;
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Unary; }
     [[nodiscard]] std::string str() const override;
@@ -77,7 +92,7 @@ public:
     explicit SymbolExpr(std::string name);
     ~SymbolExpr() override;
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Symbol; }
     [[nodiscard]] std::string str() const override;
@@ -86,11 +101,11 @@ private:
     std::string name;
 };
 
-class NumberExpr : public Expr {
+class ValueExpr : public Expr {
 public:
-    explicit NumberExpr(const std::string &value);
+    explicit ValueExpr(const Token &token);
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Number; }
     [[nodiscard]] std::string str() const override;

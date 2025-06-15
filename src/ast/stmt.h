@@ -15,10 +15,12 @@ enum class AST {
     Expr,
     Assignment,
     Block,
+    Call,
     Binary,
     Unary,
     Symbol,
     Number,
+    Literal,
 };
 
 class Stmt {
@@ -28,7 +30,7 @@ public:
 
     virtual ~Stmt();
 
-    virtual Eisdrache::Local &generate(Eisdrache::Ptr context) = 0;
+    virtual Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) = 0;
 
     [[nodiscard]] virtual constexpr AST kind() const { return AST::Stmt; }
     [[nodiscard]] virtual std::string str() const = 0;
@@ -43,7 +45,7 @@ public:
 
     void addStmt(Stmt::Ptr stmt);
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Root; }
     [[nodiscard]] std::string str() const override;
@@ -57,7 +59,7 @@ public:
     explicit VariableStmt(std::string symbol, Type::Ptr type = nullptr, std::shared_ptr<Expr> value = nullptr);
     ~VariableStmt() override;
 
-    Eisdrache::Local &generate(Eisdrache::Ptr context) override;
+    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Variable; }
     [[nodiscard]] std::string str() const override;

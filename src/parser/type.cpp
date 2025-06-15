@@ -33,12 +33,12 @@ Type::Kind Type::getKind(const std::string &kind) {
     return static_cast<Kind>(std::find(TypeKindString, TypeKindString + std::size(TypeKindString) - 1, kind) - TypeKindString);
 }
 
-Eisdrache::Ty::Ptr Type::generate(Eisdrache::Ptr context) {
+Eisdrache::Ty::Ptr Type::generate(const Eisdrache::Ptr &context) {
     switch (kind) {
         case I64: return context->getSignedTy(64);
         case F64: return context->getFloatTy(64);
         case PTR: {
-            auto cast = static_cast<PointerType *>(this);
+            auto cast = std::static_pointer_cast<PointerType>(shared_from_this());
             return cast->getPointee()->generate(context)->getPtrTo();
         }
         case AUTO:
@@ -46,6 +46,8 @@ Eisdrache::Ty::Ptr Type::generate(Eisdrache::Ptr context) {
             return nullptr;
     }
 }
+
+Type::Ptr Type::getPointerTo() { return std::make_shared<PointerType>(shared_from_this()); }
 
 
 Type::Kind Type::getKind() const { return kind; }

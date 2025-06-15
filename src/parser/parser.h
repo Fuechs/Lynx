@@ -14,6 +14,7 @@ public:
 
     Expr::Ptr parseExpr();
     Expr::Ptr parseAssignmentExpr();
+    Expr::Ptr parseCallExpr();
     Expr::Ptr parseBlockExpr();
     Expr::Ptr parseAdditiveExpr();
     Expr::Ptr parseMultiplicativeExpr();
