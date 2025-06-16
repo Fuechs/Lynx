@@ -15,13 +15,13 @@
 ![C++][cpp-badge]
 [![LLVM][llvm-badge]](https://llvm.org/) 
 
+</div>
+
 > [!WARNING]
 > Please note that Lynx is still in early development. \
 > As of now only macOS and Linux will be supported. \
 > \
 > **The language is currently being reworked.**
-
-</div>
 
 [llvm-badge]: https://img.shields.io/badge/LLVM-4c1717?logo=llvm&logoColor=white&style=for-the-badge
 [cpp-badge]: https://img.shields.io/badge/C++-1a3b63?logo=cplusplus&logoColor=white&style=for-the-badge
