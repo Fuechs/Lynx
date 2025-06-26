@@ -16,19 +16,19 @@ int main() {
     const Root::Ptr root = parser.parse();
     std::cout << root->str() << '\n';
 
-    Eisdrache::initialize();
-    Eisdrache::Ptr eisdrache = Eisdrache::create("Lynx Compiler");
+    wyvern::Wrapper::initialize();
+    wyvern::Wrapper::Ptr context = wyvern::Wrapper::create("Lynx Compiler");
 
-    Eisdrache::Func::Ptr puts = eisdrache->declareFunction(eisdrache->getSignedTy(64),
-        "puts", {eisdrache->getUnsignedPtrTy(8)});
+    wyvern::Func::Ptr puts = context->declareFunction(context->getSignedTy(64),
+        "puts", {context->getUnsignedPtrTy(8)});
     puts->addAttr(llvm::Attribute::NoCapture, 0);
 
 
-    eisdrache->declareFunction(eisdrache->getSignedTy(64), "main",
-        {{"argc", eisdrache->getSizeTy()}, {"argv", eisdrache->getUnsignedPtrPtrTy(8)}}, true);
-    root->generate(eisdrache);
-    eisdrache->createRet(eisdrache->getInt(64, 0));
-    eisdrache->dump("src/test/test.ll");
+    context->declareFunction(context->getSignedTy(64), "main",
+        {{"argc", context->getSizeTy()}, {"argv", context->getUnsignedPtrPtrTy(8)}}, true);
+    root->generate(context);
+    context->createRet(wyvern::Val::create(context, context->getSignedTy(64), context->getBuilder()->getInt64(0)));
+    context->dump("src/test/test.ll");
 
     return 0;
 }

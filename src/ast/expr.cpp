@@ -12,9 +12,9 @@ AssignmentExpr::AssignmentExpr(Ptr assignee, Ptr value)
 
 AssignmentExpr::~AssignmentExpr() = default;
 
-Eisdrache::Entity::Ptr AssignmentExpr::generate(Eisdrache::Ptr context) {
-    Eisdrache::Local::Ptr L = std::static_pointer_cast<Eisdrache::Local>(assignee->generate(context));
-    Eisdrache::Local::Ptr R = std::static_pointer_cast<Eisdrache::Local>(value->generate(context));
+wyvern::Entity::Ptr AssignmentExpr::generate(wyvern::Wrapper::Ptr context) {
+    wyvern::Local::Ptr L = std::static_pointer_cast<wyvern::Local>(assignee->generate(context));
+    wyvern::Local::Ptr R = std::static_pointer_cast<wyvern::Local>(value->generate(context));
     context->storeValue(L, R);
     return L;
 }
@@ -29,11 +29,11 @@ BlockExpr::BlockExpr(Stmt::Vec stmts) : stmts(std::move(stmts)), yieldsValue(fal
 
 BlockExpr::~BlockExpr() { stmts.clear(); }
 
-Eisdrache::Entity::Ptr BlockExpr::generate(Eisdrache::Ptr context) {
-    Eisdrache::Local::Ptr ret = context->getNull();
+wyvern::Entity::Ptr BlockExpr::generate(wyvern::Wrapper::Ptr context) {
+    wyvern::Entity::Ptr ret = context->getNull();
 
     for (const auto &stmt : stmts)
-        ret = std::static_pointer_cast<Eisdrache::Local>(stmt->generate(context));
+        ret = stmt->generate(context);
 
     return ret;
 }
@@ -59,16 +59,14 @@ CallExpr::CallExpr(Ptr callee, Vec args) : callee(std::move(callee)), args(std::
 
 CallExpr::~CallExpr() = default;
 
-Eisdrache::Entity::Ptr CallExpr::generate(Eisdrache::Ptr context) {
-    Eisdrache::Func::Ptr func = std::static_pointer_cast<Eisdrache::Func>(callee->generate(context));
+wyvern::Entity::Ptr CallExpr::generate(wyvern::Wrapper::Ptr context) {
+    wyvern::Func::Ptr func = std::static_pointer_cast<wyvern::Func>(callee->generate(context));
 
-    Eisdrache::ValueVec args_value = {};
-    for (const auto &arg : args) {
-        Eisdrache::Local::Ptr arg_local = std::static_pointer_cast<Eisdrache::Local>(arg->generate(context));
-        args_value.push_back(arg_local->getValuePtr());
-    }
+    wyvern::Entity::Vec generated_args = {};
+    for (const auto &arg : args)
+        generated_args.push_back(arg->generate(context));
 
-    return func->call(args_value);
+    return func->call(generated_args);
 }
 
 std::string CallExpr::str() const {
@@ -92,24 +90,24 @@ BinaryExpr::BinaryExpr(const BinaryOp &op, Ptr LHS, Ptr RHS)
 
 BinaryExpr::~BinaryExpr() = default;
 
-Eisdrache::Entity::Ptr BinaryExpr::generate(Eisdrache::Ptr context) {
-    Eisdrache::Local::Ptr L = std::static_pointer_cast<Eisdrache::Local>(LHS->generate(context));
-    Eisdrache::Local::Ptr R = std::static_pointer_cast<Eisdrache::Local>(RHS->generate(context));
+wyvern::Entity::Ptr BinaryExpr::generate(wyvern::Wrapper::Ptr context) {
+    wyvern::Entity::Ptr L = LHS->generate(context);
+    wyvern::Entity::Ptr R = RHS->generate(context);
 
 
     switch (op) {
-        case ADD: return context->binaryOp(Eisdrache::ADD, L, R);
-        case SUB: return context->binaryOp(Eisdrache::SUB, L, R);
-        case MUL: return context->binaryOp(Eisdrache::MUL, L, R);
-        case DIV: return context->binaryOp(Eisdrache::DIV, L, R);
+        case ADD: return context->binaryOp(wyvern::ADD, L, R);
+        case SUB: return context->binaryOp(wyvern::SUB, L, R);
+        case MUL: return context->binaryOp(wyvern::MUL, L, R);
+        case DIV: return context->binaryOp(wyvern::DIV, L, R);
         case POW: {
-            Eisdrache::Local::Ptr FL = context->typeCast(L, context->getFloatTy(64));
-            Eisdrache::Local::Ptr FR = context->typeCast(R, context->getFloatTy(64));
+            wyvern::Val::Ptr FL = context->typeCast(L, context->getFloatTy(64));
+            wyvern::Val::Ptr FR = context->typeCast(R, context->getFloatTy(64));
 
             llvm::Function *powFunc = llvm::Intrinsic::getOrInsertDeclaration(context->getModule(), llvm::Intrinsic::pow, context->getFloatTy(64)->getTy());
             llvm::Value *ret = context->getBuilder()->CreateCall(powFunc, {FL->getValuePtr(), FR->getValuePtr()});
-            Eisdrache::Local::Ptr ret_local = context->getCurrentParent()->addLocal(std::make_shared<Eisdrache::Local>(context, context->getFloatTy(64), ret));
-            return context->typeCast(ret_local, context->getSignedTy(64));
+            wyvern::Val::Ptr ret_val = wyvern::Val::create(context, context->getFloatTy(64), ret);
+            return context->typeCast(ret_val, context->getSignedTy(64));
         }
         default:            return context->getNull();
     }
@@ -125,11 +123,11 @@ UnaryExpr::UnaryExpr(const UnaryOp &op, Ptr expr) : op(op), expr(std::move(expr)
 
 UnaryExpr::~UnaryExpr() = default;
 
-Eisdrache::Entity::Ptr UnaryExpr::generate(Eisdrache::Ptr context) {
-    Eisdrache::Entity::Ptr gen = expr->generate(context);
+wyvern::Entity::Ptr UnaryExpr::generate(wyvern::Wrapper::Ptr context) {
+    wyvern::Entity::Ptr gen = expr->generate(context);
 
     switch (op) {
-        case DEREF: return std::static_pointer_cast<Eisdrache::Local>(gen)->dereference();
+        case DEREF: return std::static_pointer_cast<wyvern::Local>(gen)->dereference();
         default:    return gen;
     }
 }
@@ -145,7 +143,7 @@ SymbolExpr::SymbolExpr(std::string name) : name(std::move(name)) {}
 
 SymbolExpr::~SymbolExpr() { name.clear(); }
 
-Eisdrache::Entity::Ptr SymbolExpr::generate(Eisdrache::Ptr context) {
+wyvern::Entity::Ptr SymbolExpr::generate(wyvern::Wrapper::Ptr context) {
     if (auto func = context->getFunc(name))
         return func;
 
@@ -175,6 +173,6 @@ ValueExpr::ValueExpr(const Token &token) {
     }
 }
 
-Eisdrache::Entity::Ptr ValueExpr::generate(Eisdrache::Ptr context) { return value->generate(context); }
+wyvern::Entity::Ptr ValueExpr::generate(wyvern::Wrapper::Ptr context) { return value->generate(context); }
 
 std::string ValueExpr::str() const { return value->str(); }

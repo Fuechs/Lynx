@@ -33,7 +33,7 @@ Type::Kind Type::getKind(const std::string &kind) {
     return static_cast<Kind>(std::find(TypeKindString, TypeKindString + std::size(TypeKindString) - 1, kind) - TypeKindString);
 }
 
-Eisdrache::Ty::Ptr Type::generate(const Eisdrache::Ptr &context) {
+wyvern::Ty::Ptr Type::generate(const wyvern::Wrapper::Ptr &context) {
     switch (kind) {
         case I64: return context->getSignedTy(64);
         case F64: return context->getFloatTy(64);

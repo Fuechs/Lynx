@@ -16,8 +16,8 @@ void Root::addStmt(Stmt::Ptr stmt) {
     program.push_back(std::move(stmt));
 }
 
-Eisdrache::Entity::Ptr Root::generate(llvm::Eisdrache::Ptr context) {
-    Eisdrache::Entity::Ptr ret = nullptr;
+wyvern::Entity::Ptr Root::generate(wyvern::Wrapper::Ptr context) {
+    wyvern::Entity::Ptr ret = nullptr;
 
     for (const auto &stmt : program)
         if (!stmt)
@@ -47,9 +47,9 @@ VariableStmt::VariableStmt(std::string symbol, Type::Ptr type, std::shared_ptr<E
 
 VariableStmt::~VariableStmt() { symbol.clear(); }
 
-Eisdrache::Entity::Ptr VariableStmt::generate(Eisdrache::Ptr context) {
+wyvern::Entity::Ptr VariableStmt::generate(wyvern::Wrapper::Ptr context) {
     llvm::Value *val = value
-        ? std::static_pointer_cast<Eisdrache::Local>(value->generate(context))->getValuePtr()
+        ? std::static_pointer_cast<wyvern::Local>(value->generate(context))->getValuePtr()
         : nullptr;
     return context->declareLocal(type->generate(context), symbol, val);
 }

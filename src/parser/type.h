@@ -4,9 +4,7 @@
 #include <vector>
 
 #include "token.h"
-#include "../eisdrache/src/eisdrache.hpp"
-
-using llvm::Eisdrache;
+#include "../wyvern/src/wyvern.hpp"
 
 class Type : public std::enable_shared_from_this<Type> {
 public:
@@ -30,7 +28,7 @@ public:
     static std::string getKindValue(Kind kind);
     static Kind getKind(const std::string &kind);
 
-    virtual Eisdrache::Ty::Ptr generate(const Eisdrache::Ptr &context);
+    virtual wyvern::Ty::Ptr generate(const wyvern::Wrapper::Ptr &context);
 
     Ptr getPointerTo(); // get PtrType to this type
 

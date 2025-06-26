@@ -18,7 +18,7 @@ public:
     explicit AssignmentExpr(Ptr assignee, Ptr value);
     ~AssignmentExpr() override;
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Assignment; }
     [[nodiscard]] std::string str() const override;
@@ -32,7 +32,7 @@ public:
     explicit BlockExpr(Stmt::Vec stmts);
     ~BlockExpr() override;
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Block; }
     [[nodiscard]] std::string str() const override;
@@ -47,7 +47,7 @@ public:
     CallExpr(Ptr callee, Vec args);
     ~CallExpr() override;
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Call; }
     [[nodiscard]] std::string str() const override;
@@ -62,7 +62,7 @@ public:
     BinaryExpr(const BinaryOp &op, Ptr LHS, Ptr RHS);
     ~BinaryExpr() override;
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Binary; }
     [[nodiscard]] std::string str() const override;
@@ -77,7 +77,7 @@ public:
     UnaryExpr(const UnaryOp &op, Ptr expr);
     ~UnaryExpr() override;
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Unary; }
     [[nodiscard]] std::string str() const override;
@@ -92,7 +92,7 @@ public:
     explicit SymbolExpr(std::string name);
     ~SymbolExpr() override;
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Symbol; }
     [[nodiscard]] std::string str() const override;
@@ -105,7 +105,7 @@ class ValueExpr : public Expr {
 public:
     explicit ValueExpr(const Token &token);
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Number; }
     [[nodiscard]] std::string str() const override;

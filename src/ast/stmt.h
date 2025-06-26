@@ -2,10 +2,9 @@
 
 #include <memory>
 #include <vector>
-#include "../eisdrache/src/eisdrache.hpp"
+#include "../wyvern/src/wyvern.hpp"
 #include "../parser/type.h"
 
-using llvm::Eisdrache;
 class Expr;
 
 enum class AST {
@@ -30,7 +29,7 @@ public:
 
     virtual ~Stmt();
 
-    virtual Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) = 0;
+    virtual wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) = 0;
 
     [[nodiscard]] virtual constexpr AST kind() const { return AST::Stmt; }
     [[nodiscard]] virtual std::string str() const = 0;
@@ -45,7 +44,7 @@ public:
 
     void addStmt(Stmt::Ptr stmt);
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Root; }
     [[nodiscard]] std::string str() const override;
@@ -59,7 +58,7 @@ public:
     explicit VariableStmt(std::string symbol, Type::Ptr type = nullptr, std::shared_ptr<Expr> value = nullptr);
     ~VariableStmt() override;
 
-    Eisdrache::Entity::Ptr generate(Eisdrache::Ptr context) override;
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Variable; }
     [[nodiscard]] std::string str() const override;

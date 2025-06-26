@@ -11,19 +11,14 @@ Value::~Value() {}
 
 const Type::Ptr &Value::getType() const { return type; }
 
-Eisdrache::Local::Ptr Value::generate(const Eisdrache::Ptr &context) const {
-    using llvm::Eisdrache;
-
-    Eisdrache::Local local;
-
+wyvern::Val::Ptr Value::generate(const wyvern::Wrapper::Ptr &context) const {
     switch (type->getKind()) {
-        case Type::I64:      local = Eisdrache::Local(context, context->getSignedTy(64), context->getInt(64, i64)); break;
-        case Type::F64:      local = Eisdrache::Local(context, context->getFloatTy(64), context->getFloat(f64)); break;
-        case Type::LITERAL:  local = Eisdrache::Local(context, context->getUnsignedPtrTy(8), context->getLiteral(escapeSequences(literal))); break;
-        default:             local = Eisdrache::Local(context);
+        // TODO: need a proper function to get signed values
+        case Type::I64:     return wyvern::Val::create(context, context->getSignedTy(64), context->getBuilder()->getInt64(i64));
+        case Type::F64:     return context->getFloat(64);
+        case Type::LITERAL: return context->getLiteral(escapeSequences(literal));
+        default:            return context->getNull();
     }
-
-    return context->getCurrentParent()->addLocal(std::make_shared<Eisdrache::Local>(local));
 }
 
 std::string Value::str() const {

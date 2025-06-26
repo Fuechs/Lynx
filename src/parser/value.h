@@ -4,7 +4,7 @@
 #include <string>
 
 #include "type.h"
-#include "../eisdrache/src/eisdrache.hpp"
+#include "../wyvern/src/wyvern.hpp"
 
 class Value {
 public:
@@ -17,7 +17,7 @@ public:
     ~Value();
 
     [[nodiscard]] const Type::Ptr &getType() const;
-    [[nodiscard]] Eisdrache::Local::Ptr generate(const Eisdrache::Ptr &context) const;
+    [[nodiscard]] wyvern::Val::Ptr generate(const wyvern::Wrapper::Ptr &context) const;
 
     [[nodiscard]] std::string str() const;
 
