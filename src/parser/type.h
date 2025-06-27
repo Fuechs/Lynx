@@ -13,6 +13,7 @@ public:
 
     enum Kind {
         U8,
+        I32,
         I64,
         F64,
         PTR,

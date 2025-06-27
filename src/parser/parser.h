@@ -10,7 +10,9 @@ public:
     Root::Ptr parse();
 
     Stmt::Ptr parseStmt();
+    Stmt::Ptr parseFunctionStmt();
     Stmt::Ptr parseVariableStmt();
+    Stmt::Ptr parseReturnStmt();
 
     Expr::Ptr parseExpr();
     Expr::Ptr parseAssignmentExpr();

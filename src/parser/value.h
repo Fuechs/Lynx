@@ -10,6 +10,7 @@ class Value {
 public:
     using Ptr = std::shared_ptr<Value>;
 
+    explicit Value(const int32_t &value);
     explicit Value(const int64_t &value);
     explicit Value(const double &value);
     explicit Value(std::string value);
@@ -24,6 +25,7 @@ public:
 private:
     Type::Ptr type;
     union {
+        int32_t i32;
         int64_t i64;
         double f64;
         std::string literal;

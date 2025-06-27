@@ -10,7 +10,10 @@ class Expr;
 enum class AST {
     Stmt,
     Root,
+    FunctionPrototype,
+    Function,
     Variable,
+    Return,
     Expr,
     Assignment,
     Block,
@@ -66,5 +69,19 @@ public:
 private:
     std::string symbol;
     Type::Ptr type;
+    std::shared_ptr<Expr> value;
+};
+
+class ReturnStmt : public Stmt {
+public:
+    explicit ReturnStmt(std::shared_ptr<Expr> value);
+    ~ReturnStmt() override;
+
+    wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
+
+    [[nodiscard]] constexpr AST kind() const override { return AST::Return; }
+    [[nodiscard]] std::string str() const override;
+
+private:
     std::shared_ptr<Expr> value;
 };

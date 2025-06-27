@@ -70,3 +70,15 @@ std::string VariableStmt::str() const {
 
     return ss.str();
 }
+
+// RETURN STMT
+
+ReturnStmt::ReturnStmt(Expr::Ptr value) : value(std::move(value)) {}
+
+ReturnStmt::~ReturnStmt() = default;
+
+wyvern::Entity::Ptr ReturnStmt::generate(wyvern::Wrapper::Ptr context) {
+    return wyvern::Val::create(context, context->createRet(value->generate(context)));
+}
+
+std::string ReturnStmt::str() const { return "ret " + value->str(); }

@@ -1,6 +1,9 @@
 #include "parser.h"
 
+#include <thread>
 #include <utility>
+
+#include "function.h"
 
 Parser::Parser(Token::Vec tokens) : root(std::make_shared<Root>()), tokens(std::move(tokens)) {}
 
@@ -10,7 +13,8 @@ Root::Ptr Parser::parse() {
     Stmt::Ptr stmt;
     while (it != tokens.end())
         if ((stmt = parseStmt())) { // check if stmt isn't null
-            if (stmt->kind() != AST::Block) // expect ';' after stmt
+            if (stmt->kind() != AST::Block
+                && stmt->kind() != AST::Function) // expect ';' after stmt
                 expect(SEMICOLON);
             root->addStmt(stmt);
         }
@@ -18,7 +22,55 @@ Root::Ptr Parser::parse() {
     return root;
 }
 
-Stmt::Ptr Parser::parseStmt() { return parseVariableStmt(); }
+Stmt::Ptr Parser::parseStmt() { return parseFunctionStmt(); }
+
+Stmt::Ptr Parser::parseFunctionStmt() {
+    if (*it == IDENTIFIER && peek() == LPAREN) {
+        auto start = it++; // start at the lparen
+
+        // skip any other parens
+        for (size_t depth = 0;;) {
+            if      (eat(LPAREN)) ++depth;
+            else if (eat(RPAREN)) --depth;
+            else if (it == tokens.end()) {
+                std::cerr << "Expected ')' at line " << it->getLine() << ":" << it->getStart() << std::endl;
+                return nullptr;
+            } else eat();
+
+            // it doesn't check whether depth is < 0
+            // as the function parameters will be parsed
+            // later and any error doesn't matter yet
+            if (depth <= 0)
+                break;
+        }
+
+        if (*it != COLON && *it != POINTER) { // not a function declaration but a function call
+            it =  start;
+            // We have to call parseExpr() instead of parseCallExpr() to handle situations like this one:
+            // someCall() = x;
+            return parseExpr();
+        }
+
+        it = start;
+        std::string symbol = eat().getValue();
+        eat(LPAREN);
+        // TODO: parse parameters
+        while (!eat(RPAREN)) {}
+        Type::Ptr type = parseType();
+
+        if (*it == SEMICOLON)
+            return std::make_shared<FunctionPrototype>(symbol, type);
+
+        Stmt::Ptr body;
+        if (*it == LBRACE)
+            body = parseBlockExpr();
+        else
+            body = parseStmt();
+        return std::make_shared<Function>(symbol, type, FunctionParameter::Vec(), body);
+    }
+
+    return parseVariableStmt();
+}
 
 Stmt::Ptr Parser::parseVariableStmt() {
     if (*it == IDENTIFIER && (peek() == COLON || peek() == POINTER)) {
@@ -32,8 +84,18 @@ Stmt::Ptr Parser::parseVariableStmt() {
         return std::make_shared<VariableStmt>(symbol, type, value);
     }
 
+    return parseReturnStmt();
+}
+
+Stmt::Ptr Parser::parseReturnStmt() {
+    if (it->getValue() == "ret") {
+        eat();
+        return std::make_shared<ReturnStmt>(parseExpr());
+    }
+
     return parseExpr();
 }
+
 
 Expr::Ptr Parser::parseExpr() { return parseAssignmentExpr(); }
 

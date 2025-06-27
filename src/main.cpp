@@ -23,11 +23,7 @@ int main() {
         "puts", {context->getUnsignedPtrTy(8)});
     puts->addAttr(llvm::Attribute::NoCapture, 0);
 
-
-    context->declareFunction(context->getSignedTy(64), "main",
-        {{"argc", context->getSizeTy()}, {"argv", context->getUnsignedPtrPtrTy(8)}}, true);
     root->generate(context);
-    context->createRet(wyvern::Val::create(context, context->getSignedTy(64), context->getBuilder()->getInt64(0)));
     context->dump("src/test/test.ll");
 
     return 0;

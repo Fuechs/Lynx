@@ -13,8 +13,8 @@ AssignmentExpr::AssignmentExpr(Ptr assignee, Ptr value)
 AssignmentExpr::~AssignmentExpr() = default;
 
 wyvern::Entity::Ptr AssignmentExpr::generate(wyvern::Wrapper::Ptr context) {
-    wyvern::Local::Ptr L = std::static_pointer_cast<wyvern::Local>(assignee->generate(context));
-    wyvern::Local::Ptr R = std::static_pointer_cast<wyvern::Local>(value->generate(context));
+    wyvern::Entity::Ptr L = assignee->generate(context);
+    wyvern::Entity::Ptr R = value->generate(context);
     context->storeValue(L, R);
     return L;
 }
@@ -46,7 +46,7 @@ std::string BlockExpr::str() const {
         ss << stmts[0]->str() << "; }";
     else {
         for (const auto &stmt : stmts)
-            ss << "\n" << stmt->str() << ";";
+            ss << "\n   " << stmt->str() << ";";
         ss << "\n}";
     }
 
