@@ -48,9 +48,7 @@ VariableStmt::VariableStmt(std::string symbol, Type::Ptr type, std::shared_ptr<E
 VariableStmt::~VariableStmt() { symbol.clear(); }
 
 wyvern::Entity::Ptr VariableStmt::generate(wyvern::Wrapper::Ptr context) {
-    llvm::Value *val = value
-        ? std::static_pointer_cast<wyvern::Local>(value->generate(context))->getValuePtr()
-        : nullptr;
+    auto val = value ? value->generate(context) : nullptr;
     return context->declareLocal(type->generate(context), symbol, val);
 }
 

@@ -20,7 +20,7 @@ int main() {
     wyvern::Wrapper::Ptr context = wyvern::Wrapper::create("Lynx Compiler");
 
     wyvern::Func::Ptr puts = context->declareFunction(context->getSignedTy(64),
-        "puts", {context->getUnsignedPtrTy(8)});
+        "puts", {wyvern::Arg::create(context->getUnsignedPtrTy(8))});
     puts->addAttr(llvm::Attribute::NoCapture, 0);
 
     root->generate(context);

@@ -82,14 +82,14 @@ Token::Vec Lexer::lex() const {
         size_t pos = 0;
 
         while (pos < current_line.length()) {
-            if (current_line[pos] == '/' && pos + 1 < current_line.length() && current_line[pos + 1] == '/')
-                break;
-
             // Skip whitespace
             while (pos < current_line.length() && std::isspace(current_line[pos]))
                 pos++;
             
             if (pos >= current_line.length())
+                break;
+
+            if (current_line[pos] == '/' && pos + 1 < current_line.length() && current_line[pos + 1] == '/')
                 break;
 
             bool matched = false;

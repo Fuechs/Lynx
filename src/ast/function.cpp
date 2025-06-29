@@ -16,7 +16,7 @@ FunctionPrototype::~FunctionPrototype() {
 
 wyvern::Entity::Ptr FunctionPrototype::generate(wyvern::Wrapper::Ptr context) {
     // TODO: generate parameters
-    wyvern::Ty::Map parameters = {};
+    wyvern::Arg::Vec parameters = {};
     return context->declareFunction(type->generate(context), symbol, parameters);
 }
 
@@ -29,7 +29,7 @@ Function::Function(const std::string &symbol, const Type::Ptr &type, const Funct
 
 wyvern::Entity::Ptr Function::generate(wyvern::Wrapper::Ptr context) {
     // TODO: generate parameters
-    wyvern::Ty::Map parameters = {};
+    wyvern::Arg::Vec parameters = {};
     wyvern::Func::Ptr func = context->declareFunction(type->generate(context), symbol, parameters, true);
     body->generate(context);
     return func;

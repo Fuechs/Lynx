@@ -127,7 +127,15 @@ wyvern::Entity::Ptr UnaryExpr::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Entity::Ptr gen = expr->generate(context);
 
     switch (op) {
-        case DEREF: return std::static_pointer_cast<wyvern::Local>(gen)->dereference();
+        case DEREF:
+            if (auto local = std::static_pointer_cast<wyvern::Local>(gen))
+                return local->dereference(false);
+            if (auto value = std::static_pointer_cast<wyvern::Val>(gen))
+                return value->dereference();
+            // if (auto arg = std::static_pointer_cast<wyvern::Arg>(gen))
+            //     return nullptr; TODO: implement this
+            std::cerr << "Attempted to dereference some Entity\n";
+            return nullptr;
         default:    return gen;
     }
 }
