@@ -1,8 +1,25 @@
 #include "function.h"
 
+#include <sstream>
 #include <utility>
 
-/// PARAMETER...
+/// PARAMETER
+
+FunctionParameter::FunctionParameter(Type::Ptr type, std::string symbol)
+: type(std::move(type)), symbol(std::move(symbol)) {}
+
+FunctionParameter::~FunctionParameter() { symbol.clear(); }
+
+wyvern::Arg::Ptr FunctionParameter::generate(const wyvern::Wrapper::Ptr &context) const {
+    return wyvern::Arg::create(type->generate(context), symbol);
+}
+
+std::string FunctionParameter::str() const {
+    if (symbol.empty())
+        return type->str();
+
+    return symbol + ' ' + type->str();
+}
 
 /// PROTOTYPE
 
@@ -15,12 +32,26 @@ FunctionPrototype::~FunctionPrototype() {
 }
 
 wyvern::Entity::Ptr FunctionPrototype::generate(wyvern::Wrapper::Ptr context) {
-    // TODO: generate parameters
     wyvern::Arg::Vec parameters = {};
+
+    for (const auto &param : this->parameters)
+        parameters.push_back(param.generate(context));
+
     return context->declareFunction(type->generate(context), symbol, parameters);
 }
 
-std::string FunctionPrototype::str() const { return symbol + "()" + type->str(); }
+std::string FunctionPrototype::str() const {
+    std::stringstream ss;
+
+    ss << symbol << "(";
+
+    for (const auto &param : parameters)
+        ss << param.str();
+
+    ss << ") " + type->str();
+
+    return ss.str();
+}
 
 /// FUNCTION
 
@@ -28,8 +59,11 @@ Function::Function(const std::string &symbol, const Type::Ptr &type, const Funct
 : FunctionPrototype(symbol, type, parameters), body(std::move(body)) {}
 
 wyvern::Entity::Ptr Function::generate(wyvern::Wrapper::Ptr context) {
-    // TODO: generate parameters
     wyvern::Arg::Vec parameters = {};
+
+    for (const auto &param : this->parameters)
+        parameters.push_back(param.generate(context));
+
     wyvern::Func::Ptr func = context->declareFunction(type->generate(context), symbol, parameters, true);
     body->generate(context);
     return func;

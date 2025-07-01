@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../ast/function.h"
 #include "../lexer/token.h"
 #include "../ast/expr.h"
 
@@ -24,7 +25,8 @@ public:
     Expr::Ptr parseDereferenceExpr();
     Expr::Ptr parsePrimaryExpr();
 
-    Type::Ptr parseType();
+    Type::Ptr parseType(bool expectColon = true);
+    FunctionParameter parseFunctionParameter();
 
 private:
     // advance to the next token and return the current

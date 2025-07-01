@@ -54,19 +54,25 @@ Stmt::Ptr Parser::parseFunctionStmt() {
         it = start;
         std::string symbol = eat().getValue();
         eat(LPAREN);
-        // TODO: parse parameters
-        while (!eat(RPAREN)) {}
+
+        FunctionParameter::Vec parameters = {};
+        if (*it != RPAREN)
+            do {
+                parameters.push_back(parseFunctionParameter());
+            } while (eat(COMMA));
+        expect(RPAREN);
+
         Type::Ptr type = parseType();
 
         if (*it == SEMICOLON)
-            return std::make_shared<FunctionPrototype>(symbol, type);
+            return std::make_shared<FunctionPrototype>(symbol, type, parameters);
 
         Stmt::Ptr body;
         if (*it == LBRACE)
             body = parseBlockExpr();
         else
             body = parseStmt();
-        return std::make_shared<Function>(symbol, type, FunctionParameter::Vec(), body);
+        return std::make_shared<Function>(symbol, type, parameters, body);
     }
 
     return parseVariableStmt();
@@ -202,15 +208,15 @@ Expr::Ptr Parser::parsePrimaryExpr() {
     }
 }
 
-Type::Ptr Parser::parseType() {
+Type::Ptr Parser::parseType(bool expectColon) {
     Type::Ptr type = nullptr;
-    const bool reference = eat() == POINTER;
+    const bool reference = expectColon ? eat() == POINTER : eat(POINTER);
 
     if (*it == IDENTIFIER) {
         type = Type::create(eat());
 
         while (eat(ASTERISK))
-            type = std::make_shared<PointerType>(type);
+            type = type->getPointerTo();
     } else
         type = std::make_shared<Type>(Type::AUTO);
 
@@ -218,6 +224,16 @@ Type::Ptr Parser::parseType() {
         std::cerr << "References aren't implemented yet." << std::endl;
 
     return type;
+}
+
+FunctionParameter Parser::parseFunctionParameter() {
+    if (peek() == COLON || peek() == POINTER) { // parameter has a name
+        std::string symbol = expect(IDENTIFIER).getValue();
+        Type::Ptr type = parseType();
+        return FunctionParameter(type, symbol);
+    }
+
+    return FunctionParameter(parseType(false));
 }
 
 constexpr const Token &Parser::eat() {

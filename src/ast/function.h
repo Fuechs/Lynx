@@ -5,6 +5,17 @@
 class FunctionParameter {
 public:
     using Vec = std::vector<FunctionParameter>;
+
+    explicit FunctionParameter(Type::Ptr type = nullptr, std::string symbol = "");
+    ~FunctionParameter();
+
+    [[nodiscard]] wyvern::Arg::Ptr generate(const wyvern::Wrapper::Ptr &context) const;
+
+    [[nodiscard]] std::string str() const;
+
+private:
+    Type::Ptr type;
+    std::string symbol;
 };
 
 class FunctionPrototype : public Stmt {
@@ -31,6 +42,7 @@ public:
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Function; }
     [[nodiscard]] std::string str() const override;
+
 private:
     Stmt::Ptr body;
 };

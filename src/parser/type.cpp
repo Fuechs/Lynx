@@ -4,6 +4,7 @@
 
 const char *TypeKindString[] = {
     "u8",
+    "c8",
     "i32",
     "i64",
     "f64",
@@ -20,6 +21,7 @@ Type::~Type() = default;
 
 Type::Ptr Type::create(const Token &token) {
     switch (Kind kind = getKind(token.getValue())) {
+        case C8:
         case I32:
         case I64: return std::make_shared<IntType>(kind);
         case F64: return std::make_shared<FloatType>(kind);
@@ -36,6 +38,7 @@ Type::Kind Type::getKind(const std::string &kind) {
 
 wyvern::Ty::Ptr Type::generate(const wyvern::Wrapper::Ptr &context) {
     switch (kind) {
+        case C8:
         case U8:  return context->getUnsignedTy(8);
         case I32: return context->getSignedTy(32);
         case I64: return context->getSignedTy(64);
