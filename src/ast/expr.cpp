@@ -127,20 +127,47 @@ wyvern::Entity::Ptr UnaryExpr::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Entity::Ptr gen = expr->generate(context);
 
     switch (op) {
+        case ADDR: {
+            // invalid if not a local
+            auto local = std::dynamic_pointer_cast<wyvern::Local>(gen);
+            return context->createValue(local->getTy(), local->getPtr());
+        }
+
         case DEREF:
-            if (auto local = std::static_pointer_cast<wyvern::Local>(gen))
+            if (auto local = std::dynamic_pointer_cast<wyvern::Local>(gen))
                 return local->dereference(false);
-            if (auto value = std::static_pointer_cast<wyvern::Val>(gen))
+
+            if (auto value = std::dynamic_pointer_cast<wyvern::Val>(gen))
                 return value->dereference();
-            // if (auto arg = std::static_pointer_cast<wyvern::Arg>(gen))
-            //     return nullptr; TODO: implement this
+
+            if (auto arg = std::dynamic_pointer_cast<wyvern::Arg>(gen))
+                return arg->dereference();
+
             std::cerr << "Attempted to dereference some Entity\n";
+
             return nullptr;
-        default:    return gen;
+
+        case POST_INC: {
+            // TODO: cater int type of 1 to the value that is added to
+            auto value = context->typeCast(context->getInt(64, 1), context->getSignedTy(64));
+            auto increment = context->binaryOp(wyvern::ADD, gen, value);
+            if (gen->kind() == wyvern::Entity::LOCAL) {
+                context->storeValue(gen, increment);
+                return gen;
+            }
+
+            return increment;
+        }
+
+        default:
+            return gen;
     }
 }
 
 std::string UnaryExpr::str() const {
+    if (op == POST_DEC || op == POST_INC)
+        return "(" + expr->str() + ")" + std::string(UnaryOpValue[op]);
+
     return std::string(UnaryOpValue[op]) + "(" + expr->str() + ")";
 }
 
@@ -152,7 +179,7 @@ SymbolExpr::SymbolExpr(std::string name) : name(std::move(name)) {}
 SymbolExpr::~SymbolExpr() { name.clear(); }
 
 wyvern::Entity::Ptr SymbolExpr::generate(wyvern::Wrapper::Ptr context) {
-    if (auto func = context->getFunc(name))
+    if (auto func = context->getFunc(name, false))
         return func;
 
     return (*context->getCurrentParent())[name];

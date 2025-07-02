@@ -3,9 +3,9 @@
 #include <utility>
 #include "../util/io.h"
 
-Value::Value(const int32_t &value) :    type(std::make_shared<IntType>(Type::I32)), i32(value) {}
-Value::Value(const int64_t &value) :    type(std::make_shared<IntType>(Type::I64)), i64(value) {}
-Value::Value(const double &value) :     type(std::make_shared<FloatType>(Type::F64)), f64(value) {}
+Value::Value(const int32_t &value) :    type(std::make_shared<Type>(Type::I32)), i32(value) {}
+Value::Value(const int64_t &value) :    type(std::make_shared<Type>(Type::I64)), i64(value) {}
+Value::Value(const double &value) :     type(std::make_shared<Type>(Type::F64)), f64(value) {}
 Value::Value(std::string value) :       type(std::make_shared<Type>(Type::LITERAL)), literal(std::move(value)) {}
 
 Value::~Value() {}

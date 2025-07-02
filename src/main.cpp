@@ -20,7 +20,7 @@ int main() {
     wyvern::Wrapper::Ptr context = wyvern::Wrapper::create("Lynx Compiler");
 
     root->generate(context);
-    context->getFunc("puts")->addAttr(llvm::Attribute::NoCapture, 0);
+    // context->getFunc("puts")->addAttr(llvm::Attribute::NoCapture, 0);
     context->dump("src/test/test.ll");
 
     return 0;

@@ -70,8 +70,10 @@ Stmt::Ptr Parser::parseFunctionStmt() {
         Stmt::Ptr body;
         if (*it == LBRACE)
             body = parseBlockExpr();
-        else
+        else {
             body = parseStmt();
+            expect(SEMICOLON);
+        }
         return std::make_shared<Function>(symbol, type, parameters, body);
     }
 
@@ -174,19 +176,40 @@ Expr::Ptr Parser::parseMultiplicativeExpr() {
 }
 
 Expr::Ptr Parser::parsePowerExpr() {
-    Expr::Ptr LHS = parseDereferenceExpr();
+    Expr::Ptr LHS = parseAddressOfExpr();
 
     while (eat(CARET))
-        LHS = std::make_shared<BinaryExpr>(POW, LHS, parseDereferenceExpr());
+        LHS = std::make_shared<BinaryExpr>(POW, LHS, parseAddressOfExpr());
 
     return LHS;
+}
+
+Expr::Ptr Parser::parseAddressOfExpr() {
+    if (eat(BIT_AND))
+        return std::make_shared<UnaryExpr>(ADDR, parseAddressOfExpr());
+
+    return parseDereferenceExpr();
 }
 
 Expr::Ptr Parser::parseDereferenceExpr() {
     if (eat(ASTERISK))
         return std::make_shared<UnaryExpr>(DEREF, parseDereferenceExpr());
 
-    return parsePrimaryExpr();
+    return parseIncrementDecrementExpr();
+}
+
+Expr::Ptr Parser::parseIncrementDecrementExpr() {
+    Expr::Ptr LHS;
+
+    if (*it == MINUS_MINUS || *it == PLUS_PLUS)
+        LHS = std::make_shared<UnaryExpr>(eat() == MINUS_MINUS ? PRE_DEC : PRE_INC, parseIncrementDecrementExpr());
+    else
+        LHS = parsePrimaryExpr();
+
+    while (*it == MINUS_MINUS || *it == PLUS_PLUS)
+        LHS = std::make_shared<UnaryExpr>(eat() == MINUS_MINUS ? POST_DEC : POST_INC, LHS);
+
+    return LHS;
 }
 
 Expr::Ptr Parser::parsePrimaryExpr() {
@@ -262,7 +285,7 @@ const Token &Parser::expect(TokenType type) {
         std::cerr << "Expected '"+Token::getTypeValue(type)+"' at line " << it->getLine() << ":" << it->getStart() << std::endl;
 
     if (it != tokens.end())
-        ++it;
+        return *it++;
 
     return *it;
 }

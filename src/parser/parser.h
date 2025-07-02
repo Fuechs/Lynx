@@ -22,7 +22,9 @@ public:
     Expr::Ptr parseAdditiveExpr();
     Expr::Ptr parseMultiplicativeExpr();
     Expr::Ptr parsePowerExpr();
+    Expr::Ptr parseAddressOfExpr();
     Expr::Ptr parseDereferenceExpr();
+    Expr::Ptr parseIncrementDecrementExpr();
     Expr::Ptr parsePrimaryExpr();
 
     Type::Ptr parseType(bool expectColon = true);
@@ -33,7 +35,7 @@ private:
     constexpr const Token &eat();
     // advance to the next token and return true if the current token is of the given type
     constexpr bool eat(TokenType type);
-    // advance to the next token if the token is of the given type, throw error otherwise
+    // advance to the next token if the current token is of the given type, throw error otherwise
     const Token &expect(TokenType type);
     // peek to the next token, further or back (does not check for EOF)
     [[nodiscard]] constexpr const Token &peek(int offset = 1) const;

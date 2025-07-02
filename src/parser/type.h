@@ -12,8 +12,8 @@ public:
     using Vec = std::vector<Ptr>;
 
     enum Kind {
+        VOID,
         U8,
-        C8,
         I32,
         I64,
         F64,
@@ -46,34 +46,6 @@ public:
 
 protected:
     Kind kind;
-};
-
-// TODO: this class is unnecessary
-class IntType : public Type {
-public:
-    using Ptr = std::shared_ptr<IntType>;
-    using Vec = std::vector<Ptr>;
-
-    explicit IntType(Kind kind);
-
-    [[nodiscard]] constexpr bool isInteger() const override { return true; }
-    [[nodiscard]] constexpr bool isSigned() const override { return kind == I64; }
-
-    [[nodiscard]] std::string str() const override;
-};
-
-// TODO: this class is unnecessary
-class FloatType : public Type {
-public:
-    using Ptr = std::shared_ptr<FloatType>;
-    using Vec = std::vector<Ptr>;
-
-    explicit FloatType(Kind kind);
-
-    [[nodiscard]] constexpr bool isFloat() const override { return true; }
-    [[nodiscard]] constexpr bool isSigned() const override { return true; }
-
-    [[nodiscard]] std::string str() const override;
 };
 
 class PointerType : public Type {

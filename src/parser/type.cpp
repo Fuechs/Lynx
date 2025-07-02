@@ -3,8 +3,8 @@
 #include <utility>
 
 const char *TypeKindString[] = {
+    "void",
     "u8",
-    "c8",
     "i32",
     "i64",
     "f64",
@@ -21,10 +21,11 @@ Type::~Type() = default;
 
 Type::Ptr Type::create(const Token &token) {
     switch (Kind kind = getKind(token.getValue())) {
-        case C8:
+        case VOID: return std::make_shared<Type>(kind);
+        case U8:
         case I32:
-        case I64: return std::make_shared<IntType>(kind);
-        case F64: return std::make_shared<FloatType>(kind);
+        case I64: return std::make_shared<Type>(kind);
+        case F64: return std::make_shared<Type>(kind);
         default:  return nullptr;
     }
 }
@@ -38,11 +39,11 @@ Type::Kind Type::getKind(const std::string &kind) {
 
 wyvern::Ty::Ptr Type::generate(const wyvern::Wrapper::Ptr &context) {
     switch (kind) {
-        case C8:
-        case U8:  return context->getUnsignedTy(8);
-        case I32: return context->getSignedTy(32);
-        case I64: return context->getSignedTy(64);
-        case F64: return context->getFloatTy(64);
+        case VOID:  return context->getVoidTy();
+        case U8:    return context->getUnsignedTy(8);
+        case I32:   return context->getSignedTy(32);
+        case I64:   return context->getSignedTy(64);
+        case F64:   return context->getFloatTy(64);
         case PTR: {
             auto cast = std::static_pointer_cast<PointerType>(shared_from_this());
             return cast->getPointee()->generate(context)->getPtrTo();
@@ -59,19 +60,7 @@ Type::Ptr Type::getPointerTo() { return std::make_shared<PointerType>(shared_fro
 
 Type::Kind Type::getKind() const { return kind; }
 
-std::string Type::str() const { return ""; }
-
-// INT TYPE
-
-IntType::IntType(Kind kind) : Type(kind) {}
-
-std::string IntType::str() const { return getKindValue(kind); }
-
-// FLOAT TYPE
-
-FloatType::FloatType(Kind kind) : Type(kind) {}
-
-std::string FloatType::str() const { return getKindValue(kind); }
+std::string Type::str() const { return getKindValue(kind); }
 
 // POINTER TYPE
 

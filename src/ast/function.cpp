@@ -69,4 +69,15 @@ wyvern::Entity::Ptr Function::generate(wyvern::Wrapper::Ptr context) {
     return func;
 }
 
-std::string Function::str() const { return symbol + "() " + type->str() + " " + body->str(); }
+std::string Function::str() const {
+    std::stringstream ss;
+
+    ss << symbol << "(";
+
+    for (const auto &param : parameters)
+        ss << param.str();
+
+    ss << ") " + type->str() << " " << body->str();
+
+    return ss.str();
+}
