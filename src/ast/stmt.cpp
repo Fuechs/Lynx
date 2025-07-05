@@ -1,6 +1,7 @@
 #include <sstream>
 #include "stmt.h"
 #include "expr.h"
+#include "../analyzer/analyzer.h"
 
 // STMT
 
@@ -16,14 +17,26 @@ void Root::addStmt(Stmt::Ptr stmt) {
     program.push_back(std::move(stmt));
 }
 
+void Root::analyze(Analyzer::Ptr analyzer) {
+    auto it = program.begin();
+    while (it != program.end()) {
+        if (*it) (*it)->analyze(analyzer);
+        else {
+            std::cerr << "Encountered null stmt during analysis." << std::endl;
+            program.erase(it);
+        }
+
+        ++it;
+    }
+}
+
+Type::Ptr Root::getType(Analyzer::Ptr) const { return nullptr; }
+
 wyvern::Entity::Ptr Root::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Entity::Ptr ret = nullptr;
 
     for (const auto &stmt : program)
-        if (!stmt)
-            std::cerr << "Encountered null stmt during generation." << std::endl;
-        else
-            ret = stmt->generate(context);
+        ret = stmt->generate(context);
 
     return ret; // might be temporary, added this for basic testing
 }
@@ -46,6 +59,17 @@ VariableStmt::VariableStmt(std::string symbol, Type::Ptr type, std::shared_ptr<E
 : symbol(std::move(symbol)), type(std::move(type)), value(std::move(value)) {}
 
 VariableStmt::~VariableStmt() { symbol.clear(); }
+
+void VariableStmt::analyze(Analyzer::Ptr analyzer) {
+    if (type) type->analyze(analyzer);
+    if (value) value->analyze(analyzer);
+
+    if (*value->getType(analyzer) != *type) {
+        // insert type cast
+    }
+}
+
+Type::Ptr VariableStmt::getType(Analyzer::Ptr analyzer) const { return type; }
 
 wyvern::Entity::Ptr VariableStmt::generate(wyvern::Wrapper::Ptr context) {
     auto val = value ? value->generate(context) : nullptr;
@@ -74,6 +98,12 @@ std::string VariableStmt::str() const {
 ReturnStmt::ReturnStmt(Expr::Ptr value) : value(std::move(value)) {}
 
 ReturnStmt::~ReturnStmt() = default;
+
+void ReturnStmt::analyze(Analyzer::Ptr analyzer) {
+    if (value) value->analyze(analyzer);
+}
+
+Type::Ptr ReturnStmt::getType(Analyzer::Ptr analyzer) const { return value->getType(analyzer); }
 
 wyvern::Entity::Ptr ReturnStmt::generate(wyvern::Wrapper::Ptr context) {
     return wyvern::Val::create(context, context->createRet(value->generate(context)));

@@ -5,6 +5,7 @@
 #include "../wyvern/src/wyvern.hpp"
 #include "../parser/type.h"
 
+class Analyzer;
 class Expr;
 
 enum class AST {
@@ -32,10 +33,14 @@ public:
 
     virtual ~Stmt();
 
+    virtual void analyze(std::shared_ptr<Analyzer> analyzer) = 0;
+    virtual Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const = 0;
     virtual wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) = 0;
 
     [[nodiscard]] virtual constexpr AST kind() const { return AST::Stmt; }
     [[nodiscard]] virtual std::string str() const = 0;
+
+    constexpr bool isExpr() const { return kind() >= AST::Expr; }
 };
 
 class Root : public Stmt {
@@ -47,6 +52,8 @@ public:
 
     void addStmt(Stmt::Ptr stmt);
 
+    void analyze(std::shared_ptr<Analyzer> analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Root; }
@@ -61,6 +68,8 @@ public:
     explicit VariableStmt(std::string symbol, Type::Ptr type = nullptr, std::shared_ptr<Expr> value = nullptr);
     ~VariableStmt() override;
 
+    void analyze(std::shared_ptr<Analyzer> analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Variable; }
@@ -77,6 +86,8 @@ public:
     explicit ReturnStmt(std::shared_ptr<Expr> value);
     ~ReturnStmt() override;
 
+    void analyze(std::shared_ptr<Analyzer> analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Return; }

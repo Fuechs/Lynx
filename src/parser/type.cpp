@@ -1,6 +1,7 @@
 #include "type.h"
 
 #include <utility>
+#include "../analyzer/analyzer.h"
 
 const char *TypeKindString[] = {
     "void",
@@ -20,14 +21,7 @@ Type::Type(Kind kind) : kind(kind) {}
 Type::~Type() = default;
 
 Type::Ptr Type::create(const Token &token) {
-    switch (Kind kind = getKind(token.getValue())) {
-        case VOID: return std::make_shared<Type>(kind);
-        case U8:
-        case I32:
-        case I64: return std::make_shared<Type>(kind);
-        case F64: return std::make_shared<Type>(kind);
-        default:  return nullptr;
-    }
+    return std::make_shared<Type>(getKind(token.getValue()));
 }
 
 std::string Type::getKindValue(Kind kind) { return TypeKindString[kind]; }
@@ -35,6 +29,17 @@ std::string Type::getKindValue(Kind kind) { return TypeKindString[kind]; }
 Type::Kind Type::getKind(const std::string &kind) {
     // get index in TypeKindString and convert to Kind enum
     return static_cast<Kind>(std::find(TypeKindString, TypeKindString + std::size(TypeKindString) - 1, kind) - TypeKindString);
+}
+
+bool Type::operator==(const Type &comp) const {
+    if (comp.kind == PTR) // if this was a pointer, PointerType's operator would apply
+        return false;
+
+    return kind == comp.kind;
+}
+
+void Type::analyze(const Analyzer::Ptr &analyzer) {
+
 }
 
 wyvern::Ty::Ptr Type::generate(const wyvern::Wrapper::Ptr &context) {
@@ -57,7 +62,6 @@ wyvern::Ty::Ptr Type::generate(const wyvern::Wrapper::Ptr &context) {
 
 Type::Ptr Type::getPointerTo() { return std::make_shared<PointerType>(shared_from_this()); }
 
-
 Type::Kind Type::getKind() const { return kind; }
 
 std::string Type::str() const { return getKindValue(kind); }
@@ -65,6 +69,15 @@ std::string Type::str() const { return getKindValue(kind); }
 // POINTER TYPE
 
 PointerType::PointerType(Type::Ptr pointee) : Type(PTR), pointee(std::move(pointee)) {}
+
+bool PointerType::operator==(const Type &comp) const {
+    if (comp.getKind() != PTR)
+        return false;
+
+    return pointee == dynamic_cast<const PointerType *>(&comp)->pointee;
+}
+
+bool PointerType::operator==(const PointerType &comp) const { return pointee == comp.pointee; }
 
 Type::Ptr PointerType::getPointee() const { return pointee; }
 

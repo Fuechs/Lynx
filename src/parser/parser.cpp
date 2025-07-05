@@ -143,7 +143,11 @@ Expr::Ptr Parser::parseBlockExpr() {
                 std::cerr << "Expected '}' at line " << it->getLine() << ":" << it->getStart() << std::endl;
             else {
                 stmts.push_back(parseStmt());
-                if (stmts.back()->kind() != AST::Block)
+                if (stmts.back()->isExpr() && *it != SEMICOLON) { // convert trailing expr to return stmt
+                    auto expr = std::static_pointer_cast<Expr>(stmts.back());
+                    stmts.pop_back();
+                    stmts.push_back(std::make_shared<ReturnStmt>(expr));
+                } else if (stmts.back()->kind() != AST::Block)
                     expect(SEMICOLON);
             }
 

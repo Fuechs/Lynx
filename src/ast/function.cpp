@@ -10,6 +10,10 @@ FunctionParameter::FunctionParameter(Type::Ptr type, std::string symbol)
 
 FunctionParameter::~FunctionParameter() { symbol.clear(); }
 
+void FunctionParameter::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr FunctionParameter::getType() const { return type; }
+
 wyvern::Arg::Ptr FunctionParameter::generate(const wyvern::Wrapper::Ptr &context) const {
     return wyvern::Arg::create(type->generate(context), symbol);
 }
@@ -31,6 +35,10 @@ FunctionPrototype::~FunctionPrototype() {
     parameters.clear();
 }
 
+void FunctionPrototype::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr FunctionPrototype::getType(std::shared_ptr<Analyzer> analyzer) const { return type; }
+
 wyvern::Entity::Ptr FunctionPrototype::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Arg::Vec parameters = {};
 
@@ -48,7 +56,14 @@ std::string FunctionPrototype::str() const {
     for (const auto &param : parameters)
         ss << param.str();
 
-    ss << ") " + type->str();
+    ss << ")";
+
+    if (type) {
+        if (!type->isReference())
+            ss << ":";
+
+        ss << " " << type->str();
+    }
 
     return ss.str();
 }
@@ -57,6 +72,10 @@ std::string FunctionPrototype::str() const {
 
 Function::Function(const std::string &symbol, const Type::Ptr &type, const FunctionParameter::Vec &parameters, Stmt::Ptr body)
 : FunctionPrototype(symbol, type, parameters), body(std::move(body)) {}
+
+void Function::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr Function::getType(std::shared_ptr<Analyzer> analyzer) const { return type; }
 
 wyvern::Entity::Ptr Function::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Arg::Vec parameters = {};
@@ -77,7 +96,16 @@ std::string Function::str() const {
     for (const auto &param : parameters)
         ss << param.str();
 
-    ss << ") " + type->str() << " " << body->str();
+    ss << ")";
+
+    if (type) {
+        if (!type->isReference())
+            ss << ":";
+
+        ss << " " << type->str();
+    }
+
+    ss << " " << body->str();
 
     return ss.str();
 }

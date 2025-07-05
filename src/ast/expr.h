@@ -5,7 +5,8 @@
 
 #include "stmt.h"
 #include "operation.h"
-#include "./parser/value.h"
+#include "../parser/value.h"
+#include "../analyzer/analyzer.h"
 
 class Expr : public Stmt {
 public:
@@ -18,6 +19,8 @@ public:
     explicit AssignmentExpr(Ptr assignee, Ptr value);
     ~AssignmentExpr() override;
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Assignment; }
@@ -32,6 +35,8 @@ public:
     explicit BlockExpr(Stmt::Vec stmts);
     ~BlockExpr() override;
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Block; }
@@ -47,6 +52,8 @@ public:
     CallExpr(Ptr callee, Vec args);
     ~CallExpr() override;
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Call; }
@@ -62,6 +69,8 @@ public:
     BinaryExpr(const BinaryOp &op, Ptr LHS, Ptr RHS);
     ~BinaryExpr() override;
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Binary; }
@@ -77,6 +86,8 @@ public:
     UnaryExpr(const UnaryOp &op, Ptr expr);
     ~UnaryExpr() override;
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Unary; }
@@ -92,6 +103,8 @@ public:
     explicit SymbolExpr(std::string name);
     ~SymbolExpr() override;
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Symbol; }
@@ -105,6 +118,8 @@ class ValueExpr : public Expr {
 public:
     explicit ValueExpr(const Token &token);
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Number; }

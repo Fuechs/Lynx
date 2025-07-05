@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stmt.h"
+#include "../analyzer/analyzer.h"
 
 class FunctionParameter {
 public:
@@ -9,6 +10,8 @@ public:
     explicit FunctionParameter(Type::Ptr type = nullptr, std::string symbol = "");
     ~FunctionParameter();
 
+    void analyze(Analyzer::Ptr analyzer);
+    Type::Ptr getType() const;
     [[nodiscard]] wyvern::Arg::Ptr generate(const wyvern::Wrapper::Ptr &context) const;
 
     [[nodiscard]] std::string str() const;
@@ -23,6 +26,8 @@ public:
     FunctionPrototype(std::string symbol, Type::Ptr type, FunctionParameter::Vec parameters = {});
     ~FunctionPrototype() override;
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::FunctionPrototype; }
@@ -38,6 +43,8 @@ class Function : public FunctionPrototype {
 public:
     Function(const std::string &symbol, const Type::Ptr &type, const FunctionParameter::Vec &parameters, Stmt::Ptr body);
 
+    void analyze(Analyzer::Ptr analyzer) override;
+    Type::Ptr getType(std::shared_ptr<Analyzer> analyzer) const override;
     wyvern::Entity::Ptr generate(wyvern::Wrapper::Ptr context) override;
 
     [[nodiscard]] constexpr AST kind() const override { return AST::Function; }

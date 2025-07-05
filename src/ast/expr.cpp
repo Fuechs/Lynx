@@ -12,6 +12,10 @@ AssignmentExpr::AssignmentExpr(Ptr assignee, Ptr value)
 
 AssignmentExpr::~AssignmentExpr() = default;
 
+void AssignmentExpr::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr AssignmentExpr::getType(Analyzer::Ptr analyzer) const { return assignee->getType(analyzer); }
+
 wyvern::Entity::Ptr AssignmentExpr::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Entity::Ptr L = assignee->generate(context);
     wyvern::Entity::Ptr R = value->generate(context);
@@ -28,6 +32,16 @@ std::string AssignmentExpr::str() const {
 BlockExpr::BlockExpr(Stmt::Vec stmts) : stmts(std::move(stmts)), yieldsValue(false) {}
 
 BlockExpr::~BlockExpr() { stmts.clear(); }
+
+void BlockExpr::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr BlockExpr::getType(Analyzer::Ptr analyzer) const {
+    // temporary
+    if (stmts.back()->kind() == AST::Return)
+        return stmts.back()->getType(analyzer);
+
+    return nullptr;
+}
 
 wyvern::Entity::Ptr BlockExpr::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Entity::Ptr ret = context->getNull();
@@ -58,6 +72,10 @@ std::string BlockExpr::str() const {
 CallExpr::CallExpr(Ptr callee, Vec args) : callee(std::move(callee)), args(std::move(args)) {}
 
 CallExpr::~CallExpr() = default;
+
+void CallExpr::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr CallExpr::getType(Analyzer::Ptr analyzer) const { return callee->getType(analyzer); }
 
 wyvern::Entity::Ptr CallExpr::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Func::Ptr func = std::static_pointer_cast<wyvern::Func>(callee->generate(context));
@@ -90,10 +108,13 @@ BinaryExpr::BinaryExpr(const BinaryOp &op, Ptr LHS, Ptr RHS)
 
 BinaryExpr::~BinaryExpr() = default;
 
+void BinaryExpr::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr BinaryExpr::getType(Analyzer::Ptr analyzer) const { return LHS->getType(analyzer); }
+
 wyvern::Entity::Ptr BinaryExpr::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Entity::Ptr L = LHS->generate(context);
     wyvern::Entity::Ptr R = RHS->generate(context);
-
 
     switch (op) {
         case ADD: return context->binaryOp(wyvern::ADD, L, R);
@@ -122,6 +143,10 @@ std::string BinaryExpr::str() const {
 UnaryExpr::UnaryExpr(const UnaryOp &op, Ptr expr) : op(op), expr(std::move(expr)) {}
 
 UnaryExpr::~UnaryExpr() = default;
+
+void UnaryExpr::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr UnaryExpr::getType(Analyzer::Ptr analyzer) const { return expr->getType(analyzer); }
 
 wyvern::Entity::Ptr UnaryExpr::generate(wyvern::Wrapper::Ptr context) {
     wyvern::Entity::Ptr gen = expr->generate(context);
@@ -178,6 +203,13 @@ SymbolExpr::SymbolExpr(std::string name) : name(std::move(name)) {}
 
 SymbolExpr::~SymbolExpr() { name.clear(); }
 
+void SymbolExpr::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr SymbolExpr::getType(Analyzer::Ptr analyzer) const {
+    // lookup type
+    return nullptr;
+}
+
 wyvern::Entity::Ptr SymbolExpr::generate(wyvern::Wrapper::Ptr context) {
     if (auto func = context->getFunc(name, false))
         return func;
@@ -207,6 +239,10 @@ ValueExpr::ValueExpr(const Token &token) {
             value = nullptr;
     }
 }
+
+void ValueExpr::analyze(Analyzer::Ptr analyzer) {}
+
+Type::Ptr ValueExpr::getType(Analyzer::Ptr analyzer) const { return value->getType(); }
 
 wyvern::Entity::Ptr ValueExpr::generate(wyvern::Wrapper::Ptr context) { return value->generate(context); }
 
