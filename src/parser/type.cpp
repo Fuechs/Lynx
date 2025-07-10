@@ -10,6 +10,7 @@ const char *TypeKindString[] = {
     "i64",
     "f64",
     "ptr",
+    "ref",
     "literal",
     "auto",
 };
@@ -82,3 +83,20 @@ bool PointerType::operator==(const PointerType &comp) const { return pointee == 
 Type::Ptr PointerType::getPointee() const { return pointee; }
 
 std::string PointerType::str() const { return pointee->str() + "*"; }
+
+// REFERENCE TYPE
+
+ReferenceType::ReferenceType(Type::Ptr referee) : Type(REF), referee(std::move(referee)) {}
+
+bool ReferenceType::operator==(const Type &comp) const {
+    if (comp.getKind() != REF)
+        return false;
+
+    return referee == dynamic_cast<const ReferenceType *>(&comp)->referee;
+}
+
+bool ReferenceType::operator==(const ReferenceType &comp) const { return referee == comp.referee; }
+
+Type::Ptr ReferenceType::getReferee() const { return referee; }
+
+std::string ReferenceType::str() const { return "ref<" + referee->str() + ">"; }

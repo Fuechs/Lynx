@@ -44,8 +44,8 @@ Stmt::Ptr Parser::parseFunctionStmt() {
                 break;
         }
 
-        if (*it != COLON && *it != POINTER) { // not a function declaration but a function call
-            it =  start;
+        if (*it != POINTER) { // not a function declaration but a function call
+            it = start;
             // We have to call parseExpr() instead of parseCallExpr() to handle situations like this one:
             // someCall() = x;
             return parseExpr();
@@ -62,6 +62,7 @@ Stmt::Ptr Parser::parseFunctionStmt() {
             } while (eat(COMMA));
         expect(RPAREN);
 
+        eat(); // POINTER
         Type::Ptr type = parseType();
 
         if (*it == SEMICOLON)
@@ -81,8 +82,9 @@ Stmt::Ptr Parser::parseFunctionStmt() {
 }
 
 Stmt::Ptr Parser::parseVariableStmt() {
-    if (*it == IDENTIFIER && (peek() == COLON || peek() == POINTER)) {
+    if (*it == IDENTIFIER && peek() == COLON) {
         std::string symbol = eat().getValue();
+        eat(); // colon
         Type::Ptr type = parseType();
         Expr::Ptr value = nullptr;
 
@@ -235,9 +237,8 @@ Expr::Ptr Parser::parsePrimaryExpr() {
     }
 }
 
-Type::Ptr Parser::parseType(bool expectColon) {
+Type::Ptr Parser::parseType(bool parameter) {
     Type::Ptr type = nullptr;
-    const bool reference = expectColon ? eat() == POINTER : eat(POINTER);
 
     if (*it == IDENTIFIER) {
         type = Type::create(eat());
@@ -247,20 +248,21 @@ Type::Ptr Parser::parseType(bool expectColon) {
     } else
         type = std::make_shared<Type>(Type::AUTO);
 
-    if (reference) // TODO: handle this
-        std::cerr << "References aren't implemented yet." << std::endl;
+    if (parameter && !eat(EXCLAMATION))
+        type = std::make_shared<ReferenceType>(type);
 
     return type;
 }
 
 FunctionParameter Parser::parseFunctionParameter() {
-    if (peek() == COLON || peek() == POINTER) { // parameter has a name
+    if (peek() == COLON) { // parameter has a name
         std::string symbol = expect(IDENTIFIER).getValue();
-        Type::Ptr type = parseType();
+        eat(); // colon
+        Type::Ptr type = parseType(true);
         return FunctionParameter(type, symbol);
     }
 
-    return FunctionParameter(parseType(false));
+    return FunctionParameter(parseType(true));
 }
 
 constexpr const Token &Parser::eat() {

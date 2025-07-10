@@ -22,7 +22,7 @@ std::string FunctionParameter::str() const {
     if (symbol.empty())
         return type->str();
 
-    return symbol + ' ' + type->str();
+    return symbol + ": " + type->str();
 }
 
 /// PROTOTYPE
@@ -58,12 +58,8 @@ std::string FunctionPrototype::str() const {
 
     ss << ")";
 
-    if (type) {
-        if (!type->isReference())
-            ss << ":";
-
-        ss << " " << type->str();
-    }
+    if (type)
+        ss << " -> " << type->str();
 
     return ss.str();
 }
@@ -98,12 +94,8 @@ std::string Function::str() const {
 
     ss << ")";
 
-    if (type) {
-        if (!type->isReference())
-            ss << ":";
-
-        ss << " " << type->str();
-    }
+    if (type)
+        ss << " -> " << type->str();
 
     ss << " " << body->str();
 

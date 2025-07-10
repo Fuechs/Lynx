@@ -20,6 +20,7 @@ public:
         I64,
         F64,
         PTR,
+        REF,
         LITERAL,
         AUTO,
     };
@@ -71,4 +72,21 @@ public:
 
 private:
     Type::Ptr pointee;
+};
+
+class ReferenceType : public Type {
+public:
+    explicit ReferenceType(Type::Ptr referee);
+
+    bool operator==(const Type &comp) const override;
+    bool operator==(const ReferenceType &comp) const;
+
+    [[nodiscard]] Type::Ptr getReferee() const;
+
+    [[nodiscard]] constexpr bool isReference() const override { return true; }
+
+    [[nodiscard]] std::string str() const override;
+
+private:
+    Type::Ptr referee;
 };

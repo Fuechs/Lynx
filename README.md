@@ -21,7 +21,6 @@
 > Please note that Lynx is still in early development. \
 > As of now only Linux and macOS will be officially supported.
 
-
 ###### Hello World in Lynx
 
 ```c++

@@ -27,7 +27,7 @@ public:
     Expr::Ptr parseIncrementDecrementExpr();
     Expr::Ptr parsePrimaryExpr();
 
-    Type::Ptr parseType(bool expectColon = true);
+    Type::Ptr parseType(bool parameter = false);
     FunctionParameter parseFunctionParameter();
 
 private:
