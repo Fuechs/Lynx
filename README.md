@@ -9,7 +9,7 @@
 -->
 
 <div align="center">
-<img width="150" src="./assets/logo/lynx-logo-white.png" />
+<img width="330" src="./assets/logo/lynx-logo.png" />
 
 [![Apache License v2.0](https://img.shields.io/badge/Apache_License_v2.0-a390e4?colorA=151515&style=for-the-badge)](./LICENSE)
 ![C++][cpp-badge]
