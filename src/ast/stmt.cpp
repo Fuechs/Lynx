@@ -67,6 +67,8 @@ void VariableStmt::analyze(Analyzer::Ptr analyzer) {
     if (*value->getType(analyzer) != *type) {
         // insert type cast
     }
+
+    analyzer->insert(symbol, std::make_shared<Symbol>(analyzer, symbol, type));
 }
 
 Type::Ptr VariableStmt::getType(Analyzer::Ptr analyzer) const { return type; }
@@ -106,7 +108,12 @@ void ReturnStmt::analyze(Analyzer::Ptr analyzer) {
 Type::Ptr ReturnStmt::getType(Analyzer::Ptr analyzer) const { return value->getType(analyzer); }
 
 wyvern::Entity::Ptr ReturnStmt::generate(wyvern::Wrapper::Ptr context) {
+    if (!value)
+        return wyvern::Val::create(context, context->createRetVoid());
+
     return wyvern::Val::create(context, context->createRet(value->generate(context)));
 }
 
-std::string ReturnStmt::str() const { return "ret " + value->str(); }
+std::string ReturnStmt::str() const {
+    return "ret" + (value ? " " + value->str() : "");
+}

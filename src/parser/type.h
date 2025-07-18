@@ -12,6 +12,7 @@ class Type : public std::enable_shared_from_this<Type> {
 public:
     using Ptr = std::shared_ptr<Type>;
     using Vec = std::vector<Ptr>;
+    using Map = std::map<std::string, Ptr>;
 
     enum Kind {
         VOID,
@@ -21,6 +22,7 @@ public:
         F64,
         PTR,
         REF,
+        FUNC,
         LITERAL,
         AUTO,
     };
@@ -45,6 +47,7 @@ public:
     [[nodiscard]] virtual constexpr bool isSigned() const { return isFloat() || kind == I32 || kind == I64; }
     [[nodiscard]] virtual constexpr bool isPointer() const { return false; }
     [[nodiscard]] virtual constexpr bool isReference() const { return false; }
+    [[nodiscard]] virtual constexpr bool isFunction() const { return false; }
 
     [[nodiscard]] Kind getKind() const;
 
@@ -89,4 +92,25 @@ public:
 
 private:
     Type::Ptr referee;
+};
+
+class FunctionType : public Type {
+public:
+    using Ptr = std::shared_ptr<FunctionType>;
+
+    explicit FunctionType(Type::Ptr returnType, Type::Vec parameterTypes);
+
+    bool operator==(const Type &comp) const override;
+    bool operator==(const FunctionType &comp) const;
+
+    [[nodiscard]] constexpr const Type::Ptr &getReturnType() const { return returnType; }
+    [[nodiscard]] constexpr const Type::Vec &getParameterTypes() const { return parameterTypes; }
+
+    [[nodiscard]] constexpr bool isFunction() const override { return true; }
+
+    [[nodiscard]] std::string str() const override;
+
+private:
+    Type::Ptr returnType;
+    Type::Vec parameterTypes;
 };

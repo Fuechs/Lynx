@@ -5,6 +5,8 @@
 
 #include <sstream>
 
+#include "symbol.h"
+
 // ASSIGNMENT EXPR
 
 AssignmentExpr::AssignmentExpr(Ptr assignee, Ptr value)
@@ -33,7 +35,15 @@ BlockExpr::BlockExpr(Stmt::Vec stmts) : stmts(std::move(stmts)), yieldsValue(fal
 
 BlockExpr::~BlockExpr() { stmts.clear(); }
 
-void BlockExpr::analyze(Analyzer::Ptr analyzer) {}
+void BlockExpr::analyze(Analyzer::Ptr analyzer) {
+    analyzer->enterScope();
+
+    for (auto &stmt : stmts)
+        if (stmt)
+            stmt->analyze(analyzer);
+
+    analyzer->leaveScope();
+}
 
 Type::Ptr BlockExpr::getType(Analyzer::Ptr analyzer) const {
     // temporary
@@ -73,7 +83,23 @@ CallExpr::CallExpr(Ptr callee, Vec args) : callee(std::move(callee)), args(std::
 
 CallExpr::~CallExpr() = default;
 
-void CallExpr::analyze(Analyzer::Ptr analyzer) {}
+void CallExpr::analyze(Analyzer::Ptr analyzer) {
+    if (!callee)
+        return;
+
+    callee->analyze(analyzer);
+    // TODO: standard values
+    const auto &ftype = std::static_pointer_cast<FunctionType>(callee->getType(analyzer));
+    const Type::Vec &params = ftype->getParameterTypes();
+
+    for (size_t i = 0; i < args.size(); ++i) {
+        args[i]->analyze(analyzer);
+
+        // if parameters isn't a reference and arg is a pointer, insert dereference op
+        if (!params[i]->isReference() && args[i]->getType(analyzer)->isPointer())
+            args[i] = std::make_shared<UnaryExpr>(DEREF, args[i]);
+    }
+}
 
 Type::Ptr CallExpr::getType(Analyzer::Ptr analyzer) const { return callee->getType(analyzer); }
 
@@ -206,8 +232,7 @@ SymbolExpr::~SymbolExpr() { name.clear(); }
 void SymbolExpr::analyze(Analyzer::Ptr analyzer) {}
 
 Type::Ptr SymbolExpr::getType(Analyzer::Ptr analyzer) const {
-    // lookup type
-    return nullptr;
+    return analyzer->lookup(name)->getType();
 }
 
 wyvern::Entity::Ptr SymbolExpr::generate(wyvern::Wrapper::Ptr context) {

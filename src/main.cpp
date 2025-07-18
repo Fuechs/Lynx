@@ -16,6 +16,10 @@ int main() {
     const Root::Ptr root = parser.parse();
     std::cout << root->str() << '\n';
 
+    Analyzer::Ptr analyzer = std::make_shared<Analyzer>(root);
+    analyzer->analyze();
+
+    wyvern::DO_NOT_LOAD = true;
     wyvern::Wrapper::initialize();
     wyvern::Wrapper::Ptr context = wyvern::Wrapper::create("Lynx Compiler");
 

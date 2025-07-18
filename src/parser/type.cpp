@@ -1,5 +1,6 @@
 #include "type.h"
 
+#include <sstream>
 #include <utility>
 #include "../analyzer/analyzer.h"
 
@@ -54,6 +55,10 @@ wyvern::Ty::Ptr Type::generate(const wyvern::Wrapper::Ptr &context) {
             auto cast = std::static_pointer_cast<PointerType>(shared_from_this());
             return cast->getPointee()->generate(context)->getPtrTo();
         }
+        case REF: {
+            auto cast = std::static_pointer_cast<ReferenceType>(shared_from_this());
+            return cast->getReferee()->generate(context)->getPtrTo();
+        }
         case LITERAL: return context->getUnsignedPtrTy(8);
         case AUTO:
         default:
@@ -100,3 +105,33 @@ bool ReferenceType::operator==(const ReferenceType &comp) const { return referee
 Type::Ptr ReferenceType::getReferee() const { return referee; }
 
 std::string ReferenceType::str() const { return "ref<" + referee->str() + ">"; }
+
+// FUNCTION TYPE
+
+FunctionType::FunctionType(Type::Ptr returnType, Type::Vec parameterTypes)
+: Type(FUNC), returnType(std::move(returnType)), parameterTypes(std::move(parameterTypes)) {}
+
+bool FunctionType::operator==(const Type &comp) const {
+    if (comp.getKind() != FUNC)
+        return false;
+
+    const auto &cast = dynamic_cast<const FunctionType *>(&comp);
+    return returnType == cast->returnType && parameterTypes == cast->parameterTypes;
+}
+
+bool FunctionType::operator==(const FunctionType &comp) const {
+    return returnType == comp.returnType && parameterTypes == comp.parameterTypes;
+}
+
+std::string FunctionType::str() const {
+    std::stringstream ss;
+
+    ss << "(";
+
+    for (size_t i = 0; i < parameterTypes.size(); i++)
+        ss << parameterTypes[i]->str() << (i == parameterTypes.size() - 1 ? "" : ", ");
+
+    ss << ") -> " << returnType->str();
+
+    return ss.str();
+}

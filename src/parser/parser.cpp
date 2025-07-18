@@ -55,18 +55,23 @@ Stmt::Ptr Parser::parseFunctionStmt() {
         std::string symbol = eat().getValue();
         eat(LPAREN);
 
-        FunctionParameter::Vec parameters = {};
+        Type::Vec parameter_types = {};
+        std::vector<std::string> parameter_names = {};
         if (*it != RPAREN)
             do {
-                parameters.push_back(parseFunctionParameter());
+                auto [name, type] = parseFunctionParameter();
+                parameter_names.push_back(std::move(name));
+                parameter_types.push_back(std::move(type));
             } while (eat(COMMA));
         expect(RPAREN);
 
         eat(); // POINTER
         Type::Ptr type = parseType();
 
+        FunctionType::Ptr ftype = std::make_shared<FunctionType>(type, parameter_types);
+
         if (*it == SEMICOLON)
-            return std::make_shared<FunctionPrototype>(symbol, type, parameters);
+            return std::make_shared<FunctionPrototype>(symbol, ftype, parameter_names);
 
         Stmt::Ptr body;
         if (*it == LBRACE)
@@ -75,7 +80,7 @@ Stmt::Ptr Parser::parseFunctionStmt() {
             body = parseStmt();
             expect(SEMICOLON);
         }
-        return std::make_shared<Function>(symbol, type, parameters, body);
+        return std::make_shared<Function>(symbol, ftype, parameter_names, body);
     }
 
     return parseVariableStmt();
@@ -98,12 +103,13 @@ Stmt::Ptr Parser::parseVariableStmt() {
 }
 
 Stmt::Ptr Parser::parseReturnStmt() {
-    if (it->getValue() == "ret") {
-        eat();
-        return std::make_shared<ReturnStmt>(parseExpr());
-    }
+    if (!eat("ret"))
+        return parseExpr();
 
-    return parseExpr();
+    if (*it == SEMICOLON)
+        return std::make_shared<ReturnStmt>();
+
+    return std::make_shared<ReturnStmt>(parseExpr());
 }
 
 
@@ -254,15 +260,15 @@ Type::Ptr Parser::parseType(bool parameter) {
     return type;
 }
 
-FunctionParameter Parser::parseFunctionParameter() {
+std::pair<std::string, Type::Ptr> Parser::parseFunctionParameter() {
     if (peek() == COLON) { // parameter has a name
         std::string symbol = expect(IDENTIFIER).getValue();
         eat(); // colon
         Type::Ptr type = parseType(true);
-        return FunctionParameter(type, symbol);
+        return {symbol, type};
     }
 
-    return FunctionParameter(parseType(true));
+    return {"", parseType(true)};
 }
 
 constexpr const Token &Parser::eat() {
@@ -274,6 +280,15 @@ constexpr const Token &Parser::eat() {
 
 constexpr bool Parser::eat(TokenType type) {
     if (it != tokens.end() && *it == type) {
+        ++it;
+        return true;
+    }
+
+    return false;
+}
+
+constexpr bool Parser::eat(const std::string &value) {
+    if (it != tokens.end() && it->getValue() == value) {
         ++it;
         return true;
     }

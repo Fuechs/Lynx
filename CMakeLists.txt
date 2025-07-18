@@ -30,6 +30,7 @@ llvm_map_components_to_libnames(llvm_libs
 
 set(SOURCES
         src/analyzer/analyzer.cpp
+        src/analyzer/symbol.cpp
         src/ast/expr.cpp
         src/ast/function.cpp
         src/ast/stmt.cpp
@@ -43,7 +44,6 @@ set(SOURCES
         src/main.cpp
 )
 
-# Include directories
 include_directories(
         ${PROJECT_SOURCE_DIR}/src
         ${PROJECT_SOURCE_DIR}/src/analyzer
@@ -53,7 +53,6 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src/util
 )
 
-# Create executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(Lynx PRIVATE ${llvm_libs})

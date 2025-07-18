@@ -28,13 +28,15 @@ public:
     Expr::Ptr parsePrimaryExpr();
 
     Type::Ptr parseType(bool parameter = false);
-    FunctionParameter parseFunctionParameter();
+    std::pair<std::string, Type::Ptr> parseFunctionParameter();
 
 private:
     // advance to the next token and return the current
     constexpr const Token &eat();
     // advance to the next token and return true if the current token is of the given type
     constexpr bool eat(TokenType type);
+    // advance to the next token and return true if the current token has the given value
+    constexpr bool eat(const std::string &value);
     // advance to the next token if the current token is of the given type, throw error otherwise
     const Token &expect(TokenType type);
     // peek to the next token, further or back (does not check for EOF)

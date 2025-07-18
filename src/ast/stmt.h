@@ -83,7 +83,7 @@ private:
 
 class ReturnStmt : public Stmt {
 public:
-    explicit ReturnStmt(std::shared_ptr<Expr> value);
+    explicit ReturnStmt(std::shared_ptr<Expr> value = nullptr);
     ~ReturnStmt() override;
 
     void analyze(std::shared_ptr<Analyzer> analyzer) override;
